@@ -1,72 +1,49 @@
 import { motion } from 'framer-motion';
 import { SectionHeading } from '../ui/SectionHeading';
-import { SiPython, SiOpenjdk, SiHtml5, SiCss, SiJavascript, SiNextdotjs, SiBootstrap, SiGit, SiSupabase, SiPostgresql, SiTensorflow, SiOpencv } from 'react-icons/si';
-import { Code2, BarChart3, Database } from 'lucide-react';
 
 const skills = [
   {
     category: "Languages",
-    items: [
-      { name: "Python", icon: SiPython, color: "#3776AB" },
-      { name: "Java", icon: SiOpenjdk, color: "#007396" },
-      { name: "SQL", icon: SiPostgresql, color: "#336791" },
-    ]
+    items: ["Python", "Java", "SQL", "JavaScript", "HTML5", "CSS3"]
   },
   {
-    category: "Web Technologies",
-    items: [
-      { name: "Next.js", icon: SiNextdotjs, color: "#ffffff" },
-      { name: "JavaScript", icon: SiJavascript, color: "#F7DF1E" },
-      { name: "HTML5", icon: SiHtml5, color: "#E34F26" },
-      { name: "CSS3", icon: SiCss, color: "#1572B6" },
-      { name: "Bootstrap", icon: SiBootstrap, color: "#7952B3" },
-    ]
+    category: "Frameworks & Libraries",
+    items: ["Next.js", "React", "TensorFlow", "OpenCV", "Bootstrap", "Tailwind CSS"]
   },
   {
-    category: "AI & Tools",
-    items: [
-      { name: "TensorFlow", icon: SiTensorflow, color: "#FF6F00" },
-      { name: "OpenCV", icon: SiOpencv, color: "#5C3EE8" },
-      { name: "Git", icon: SiGit, color: "#F05032" },
-      { name: "Supabase", icon: SiSupabase, color: "#3ECF8E" },
-      { name: "Tableau", icon: BarChart3, color: "#E97627" },
-      { name: "PostgreSQL", icon: SiPostgresql, color: "#336791" },
-    ]
+    category: "Tools & Infrastructure",
+    items: ["Git", "Supabase", "PostgreSQL", "Tableau", "Raspberry Pi", "Vercel"]
   }
 ];
 
 export function Skills() {
   return (
     <section id="skills" className="py-24 md:py-32 relative">
-      <div className="container mx-auto px-4 md:px-6">
-        <SectionHeading title="Arsenal" subtitle="Technical capabilities" align="center" />
+      <div className="container mx-auto px-6 md:px-12">
+        <SectionHeading num="03" title="Capabilities" />
         
-        <div className="grid md:grid-cols-3 gap-8 mt-16 max-w-6xl mx-auto">
+        <div className="mt-16 max-w-4xl flex flex-col gap-12">
           {skills.map((group, idx) => (
             <motion.div
               key={group.category}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.6, delay: idx * 0.2 }}
-              className="glass-card p-6 rounded-xl border border-white/5 relative overflow-hidden group"
+              transition={{ duration: 0.6, delay: idx * 0.1 }}
+              className="flex flex-col md:flex-row gap-6 md:gap-12 md:items-baseline border-b border-white/5 pb-12 last:border-0"
             >
-              <div className="absolute -inset-1 bg-gradient-to-b from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity blur-md" />
-              
-              <h3 className="text-xl font-bold font-display uppercase tracking-widest text-foreground mb-8 text-center border-b border-white/10 pb-4">
+              <h3 className="w-full md:w-1/3 text-sm font-sans text-muted-foreground uppercase tracking-[0.2em] pt-2">
                 {group.category}
               </h3>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="w-full md:w-2/3 flex flex-wrap gap-3">
                 {group.items.map((skill) => (
-                  <motion.div
-                    key={skill.name}
-                    whileHover={{ scale: 1.05, y: -5 }}
-                    className="flex flex-col items-center justify-center p-4 bg-background/50 rounded-lg border border-white/5 hover:border-primary/30 transition-colors"
+                  <span
+                    key={skill}
+                    className="px-4 py-2 text-sm font-sans text-foreground bg-white/[0.03] border border-white/[0.1] hover:border-primary/50 hover:text-primary transition-all duration-300 rounded-full cursor-default hover:shadow-[0_0_15px_rgba(201,169,110,0.15)]"
                   >
-                    <skill.icon size={32} className="mb-3 opacity-80 group-hover:opacity-100 transition-opacity" style={{ color: skill.color }} />
-                    <span className="text-xs font-mono text-muted-foreground text-center">{skill.name}</span>
-                  </motion.div>
+                    {skill}
+                  </span>
                 ))}
               </div>
             </motion.div>

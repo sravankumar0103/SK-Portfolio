@@ -1,61 +1,70 @@
 import { motion } from 'framer-motion';
+import { ExternalLink } from 'lucide-react';
 import { SectionHeading } from '../ui/SectionHeading';
-import { Award, Shield, Cloud, BrainCircuit } from 'lucide-react';
 
 const certs = [
   {
     name: "Google Cybersecurity",
-    issuer: "Coursera",
-    icon: Shield,
-    color: "text-blue-400",
-    borderClass: "group-hover:border-blue-400"
+    issuer: "Google / Coursera",
+    date: "2024",
+    link: "https://www.coursera.org/account/accomplishments/professional-cert/HZXL29HPYAK2"
   },
   {
     name: "Machine Learning & Artificial Intelligence",
     issuer: "IBM",
-    icon: BrainCircuit,
-    color: "text-primary",
-    borderClass: "group-hover:border-primary"
+    date: "2023"
   },
   {
     name: "Machine Learning, Data Engineering, Cloud Architecting",
     issuer: "AWS Academy",
-    icon: Cloud,
-    color: "text-orange-400",
-    borderClass: "group-hover:border-orange-400"
+    date: "2023"
   }
 ];
 
 export function Certifications() {
   return (
     <section id="certifications" className="py-24 md:py-32 relative">
-      <div className="container mx-auto px-4 md:px-6">
-        <SectionHeading title="Credentials" subtitle="Verified expertise" align="center" />
-        
-        <div className="grid md:grid-cols-3 gap-6 mt-16 max-w-5xl mx-auto">
+      <div className="container mx-auto px-6 md:px-12">
+        <SectionHeading num="05" title="Certifications" />
+
+        <div className="mt-16 max-w-4xl">
           {certs.map((cert, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: index * 0.15 }}
-              whileHover={{ y: -5 }}
-              className={`glass-card p-6 rounded-xl border border-white/5 transition-all duration-300 relative overflow-hidden group ${cert.borderClass}`}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              className="group border-b border-white/5 relative"
             >
-              <div className="absolute top-0 right-0 p-4 opacity-10">
-                <Award className="w-24 h-24" />
-              </div>
-              
-              <div className="relative z-10">
-                <cert.icon className={`w-8 h-8 mb-4 ${cert.color}`} />
-                <h3 className="text-lg font-bold text-foreground mb-2 leading-tight">
-                  {cert.name}
-                </h3>
-                <p className="text-sm font-mono text-muted-foreground uppercase tracking-widest">
-                  {cert.issuer}
-                </p>
-              </div>
+              <a
+                href={cert.link || '#'}
+                target={cert.link ? "_blank" : undefined}
+                rel={cert.link ? "noopener noreferrer" : undefined}
+                className={`flex flex-col md:flex-row md:items-center justify-between py-8 w-full ${cert.link ? 'cursor-pointer' : 'cursor-default'}`}
+              >
+                <div className="absolute bottom-0 left-0 h-[1px] w-0 bg-primary group-hover:w-full transition-all duration-500 ease-out" />
+
+                <div className="mb-2 md:mb-0 pr-8">
+                  <div className="flex items-center gap-3">
+                    <h3 className="text-xl font-sans font-medium text-foreground group-hover:text-primary transition-colors">
+                      {cert.name}
+                    </h3>
+                    {cert.link && (
+                      <div className="text-muted-foreground group-hover:text-primary opacity-0 group-hover:opacity-100 transition-all duration-300">
+                        <ExternalLink className="w-4 h-4" />
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-sm font-sans text-muted-foreground mt-1">
+                    {cert.issuer}
+                  </p>
+                </div>
+
+                <div className="text-sm font-sans text-muted-foreground uppercase tracking-widest shrink-0">
+                  {cert.date}
+                </div>
+              </a>
             </motion.div>
           ))}
         </div>

@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { motion, useScroll, useSpring } from 'framer-motion';
 
 const navItems = [
-  { name: 'Home', href: '#home' },
   { name: 'About', href: '#about' },
   { name: 'Experience', href: '#experience' },
   { name: 'Skills', href: '#skills' },
@@ -19,19 +18,18 @@ export function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-      
-      // Simple scrollspy
+      setIsScrolled(window.scrollY > 20);
+
       const sections = navItems.map(item => item.href.substring(1));
       let current = '';
-      
+
       for (const section of sections) {
         const element = document.getElementById(section);
-        if (element && window.scrollY >= element.offsetTop - 200) {
+        if (element && window.scrollY >= element.offsetTop - 300) {
           current = section;
         }
       }
-      
+
       if (current && current !== activeSection) {
         setActiveSection(current);
       }
@@ -51,54 +49,41 @@ export function Navbar() {
 
   return (
     <>
-      <motion.div
-        className="fixed top-0 left-0 right-0 h-1 bg-primary z-50 origin-left"
-        style={{ scaleX }}
-      />
-      
-      <header 
-        className={`fixed top-0 w-full z-40 transition-all duration-300 ${
-          isScrolled ? 'bg-background/80 backdrop-blur-md border-b border-white/5 py-4' : 'bg-transparent py-6'
-        }`}
+      <header
+        className={`fixed top-0 w-full z-40 transition-all duration-500 ${isScrolled ? 'py-4' : 'py-6'
+          }`}
+        style={{
+          background: isScrolled ? 'rgba(8, 8, 8, 0.65)' : 'transparent',
+          backdropFilter: isScrolled ? 'blur(16px) saturate(180%)' : 'none',
+          WebkitBackdropFilter: isScrolled ? 'blur(16px) saturate(180%)' : 'none',
+          boxShadow: isScrolled ? '0 10px 30px -10px rgba(0, 0, 0, 0.5)' : 'none',
+        }}
       >
-        <div className="container mx-auto px-4 md:px-6 flex justify-between items-center">
-          <a href="#home" onClick={(e) => handleClick(e, '#home')} className="text-xl font-black font-display tracking-widest group relative">
-            <span className="text-foreground">DSK</span>
-            <span className="text-primary ml-1 group-hover:animate-pulse">_</span>
-            <div className="absolute -inset-2 bg-primary/20 blur-md rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="container mx-auto px-6 md:px-12 flex justify-between items-center">
+          <a href="#home" onClick={(e) => handleClick(e, '#home')} className="text-xl font-display font-medium text-foreground tracking-wide hover:text-primary transition-colors">
+            DSK
           </a>
-          
-          <nav className="hidden md:flex gap-6 lg:gap-8">
+
+          <nav className="hidden md:flex gap-8 items-center">
             {navItems.map((item) => (
               <a
                 key={item.name}
                 href={item.href}
-                onClick={(e) => handleClick(e, item.href)}
-                className={`text-sm uppercase tracking-wider font-mono transition-colors relative ${
-                  activeSection === item.href.substring(1) ? 'text-primary glow-text' : 'text-muted-foreground hover:text-foreground'
-                }`}
+                onClick={(e) => !item.isButton && handleClick(e, item.href)}
+                className={`text-sm font-sans transition-all ${item.isButton
+                    ? 'px-4 py-2 border border-primary/50 rounded-full text-primary hover:bg-primary hover:text-background'
+                    : (activeSection === item.href.substring(1)
+                      ? 'text-primary'
+                      : 'text-muted-foreground hover:text-primary')
+                  }`}
+                style={{ letterSpacing: '0.02em' }}
+                target={item.isButton ? "_blank" : undefined}
+                rel={item.isButton ? "noopener noreferrer" : undefined}
               >
                 {item.name}
-                {activeSection === item.href.substring(1) && (
-                  <motion.span
-                    layoutId="activeNav"
-                    className="absolute -bottom-2 left-0 right-0 h-[2px] bg-primary shadow-[0_0_8px_rgba(0,255,255,0.8)]"
-                    initial={false}
-                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                  />
-                )}
               </a>
             ))}
           </nav>
-          
-          {/* Mobile nav could go here */}
-          <button className="md:hidden text-foreground">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinelinejoin="round">
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-          </button>
         </div>
       </header>
     </>

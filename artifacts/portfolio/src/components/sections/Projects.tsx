@@ -1,55 +1,47 @@
 import { motion } from 'framer-motion';
 import { SectionHeading } from '../ui/SectionHeading';
-import { ExternalLink, Github, Cpu, Layout, Code2 } from 'lucide-react';
+import { ArrowRight, Github, ExternalLink } from 'lucide-react';
 
 const projects = [
   {
     title: "Hexapod Robotic Arm",
-    type: "Robotics / AI",
-    icon: Cpu,
-    description: "Integrated a robotic arm into a 16-DOF hexapod robot. Utilized AI, ML, and Computer Vision for adaptive autonomous execution. Included an AR-based interface for real-time visualization.",
+    description: "Integrated a robotic arm into a 16-DOF hexapod robot for real-time object manipulation and automated task execution. Utilized AI, ML, and Computer Vision for adaptive autonomous behavior. Included an AR-based interface for real-time visualization.",
     tech: ["Python", "OpenCV", "TensorFlow", "Raspberry Pi 5"],
-    color: "from-primary to-blue-600",
-    glow: "rgba(0, 255, 255, 0.4)"
+    github: "https://github.com/sravankumar0103",
+    live: "#"
   },
   {
     title: "VaultIX",
-    type: "Full-Stack Web App",
-    icon: Layout,
-    description: "Secure Bookmark & Knowledge Management Web App. Features authentication, real-time sync, CRUD operations, advanced search/filtering, analytics, and automated email notifications.",
-    tech: ["Next.js", "React", "Tailwind", "Supabase", "PostgreSQL"],
-    color: "from-secondary to-purple-800",
-    glow: "rgba(138, 43, 226, 0.4)"
+    description: "Secure Bookmark & Knowledge Management platform designed for efficient information storage and retrieval. Features real-time synchronization, advanced search filtering, integrated analytics, and automated notification systems.",
+    tech: ["Next.js", "React", "Supabase", "PostgreSQL"],
+    github: "https://github.com/sravankumar0103/VaultIX",
+    live: "https://vaultix-sk.vercel.app/"
   },
   {
     title: "Web App Suite",
-    type: "Frontend Projects",
-    icon: Code2,
     description: "A collection of interactive web applications built during virtual internship, including a responsive landing page, Tic-Tac-Toe game, and a Stopwatch tool.",
     tech: ["HTML5", "CSS3", "JavaScript"],
-    color: "from-green-400 to-emerald-700",
-    glow: "rgba(74, 222, 128, 0.4)"
+    github: "https://github.com/sravankumar0103",
+    live: "#"
   },
   {
     title: "Python Utilities",
-    type: "Backend Scripts",
-    icon: Code2,
     description: "Suite of Python utility applications focusing on logic and automation: Word Counter, Expense Tracker, and a Username Generator.",
-    tech: ["Python", "Automation"],
-    color: "from-orange-400 to-red-600",
-    glow: "rgba(251, 146, 60, 0.4)"
+    tech: ["Python", "Automation Scripts"],
+    github: "https://github.com/sravankumar0103",
+    live: "#"
   }
 ];
 
 export function Projects() {
   return (
-    <section id="projects" className="py-24 md:py-32 relative overflow-hidden">
-      <div className="container mx-auto px-4 md:px-6">
-        <SectionHeading title="Databases" subtitle="Project catalog" />
+    <section id="projects" className="py-24 md:py-32 relative">
+      <div className="container mx-auto px-6 md:px-12">
+        <SectionHeading num="04" title="Selected Works" />
         
-        <div className="grid md:grid-cols-2 gap-8 mt-12 max-w-5xl mx-auto">
+        <div className="flex flex-col mt-16 max-w-5xl">
           {projects.map((project, idx) => (
-            <ProjectCard key={project.title} project={project} index={idx} />
+            <ProjectRow key={project.title} project={project} index={idx} />
           ))}
         </div>
       </div>
@@ -57,59 +49,79 @@ export function Projects() {
   );
 }
 
-function ProjectCard({ project, index }: { project: any, index: number }) {
-  const Icon = project.icon;
+function ProjectRow({ project, index }: { project: any, index: number }) {
+  const num = (index + 1).toString().padStart(2, '0');
   
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      whileInView={{ opacity: 1, scale: 1 }}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      whileHover={{ y: -10 }}
-      className="group perspective"
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: index * 0.1 }}
+      className="group relative border-b border-white/5 py-8 px-6 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden cursor-pointer"
     >
-      <div className="relative h-full glass-card p-8 rounded-xl border border-white/5 hover:border-white/20 transition-colors overflow-hidden transform-style-3d preserve-3d transition-transform duration-500">
-        {/* Glow effect on hover */}
-        <div 
-          className="absolute -inset-2 bg-gradient-to-br opacity-0 group-hover:opacity-20 transition-opacity blur-xl z-0"
-          style={{ backgroundImage: `linear-gradient(to bottom right, var(--tw-gradient-stops))`, '--tw-gradient-from': project.color.split(' ')[0].replace('from-', ''), '--tw-gradient-to': project.color.split(' ')[1].replace('to-', '') } as any}
-        />
+      {/* Cinematic Background Hover */}
+      <div className="absolute inset-0 bg-white/[0.01] translate-y-full group-hover:translate-y-0 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]" />
+      <div className="absolute inset-y-0 left-0 w-1 bg-primary scale-y-0 group-hover:scale-y-100 transition-transform duration-500 origin-bottom" />
+
+      <div className="relative z-10 flex flex-col md:flex-row gap-4 md:gap-12 md:items-start">
+        {/* Project Number */}
+        <div className="text-xs font-sans font-medium text-primary/40 group-hover:text-primary transition-colors pt-1.5">
+          {num}
+        </div>
         
-        <div className="relative z-10 h-full flex flex-col">
-          <div className="flex justify-between items-start mb-6">
-            <div className={`p-3 rounded-lg bg-gradient-to-br ${project.color} bg-opacity-20 flex items-center justify-center shadow-lg`}>
-              <Icon className="w-6 h-6 text-white" />
-            </div>
+        <div className="flex-1">
+          <div className="flex flex-col gap-3">
+            <h3 className="text-3xl md:text-5xl font-display font-medium text-foreground/90 group-hover:text-foreground transition-all duration-500 group-hover:tracking-tight">
+              {project.title}
+            </h3>
             
-            <div className="flex gap-2">
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors p-2 bg-background/50 rounded-full border border-white/5">
+            <div className="flex flex-wrap gap-2">
+              {project.tech.map((t: string) => (
+                <span key={t} className="text-[9px] font-sans text-muted-foreground uppercase tracking-[0.2em] px-2.5 py-0.5 bg-white/[0.03] border border-white/5 rounded-full group-hover:border-primary/20 transition-colors">
+                  {t}
+                </span>
+              ))}
+            </div>
+          </div>
+          
+          <div className="grid grid-rows-[0.1fr] group-hover:grid-rows-[1fr] transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] opacity-0 group-hover:opacity-100">
+            <div className="overflow-hidden">
+              <p className="text-sm font-sans text-muted-foreground leading-relaxed pt-6 max-w-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+                {project.description}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Icons */}
+        <div className="flex items-center gap-4 self-end md:self-start pt-1.5">
+          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-500 delay-100">
+            {project.github && (
+              <a 
+                href={project.github} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="p-1.5 text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-110"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <Github className="w-4 h-4" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors p-2 bg-background/50 rounded-full border border-white/5">
+            )}
+            {project.live && project.live !== '#' && (
+              <a 
+                href={project.live} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="p-1.5 text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-110"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <ExternalLink className="w-4 h-4" />
               </a>
-            </div>
+            )}
           </div>
-          
-          <h3 className="text-2xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
-            {project.title}
-          </h3>
-          
-          <div className="text-xs font-mono text-secondary mb-4 uppercase tracking-wider">
-            {project.type}
-          </div>
-          
-          <p className="text-muted-foreground text-sm leading-relaxed mb-6 flex-grow">
-            {project.description}
-          </p>
-          
-          <div className="flex flex-wrap gap-2 mt-auto pt-4 border-t border-white/5">
-            {project.tech.map((t: string) => (
-              <span key={t} className="text-xs font-mono text-foreground/70">
-                {t}
-              </span>
-            ))}
+          <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-muted-foreground group-hover:bg-primary group-hover:text-background group-hover:border-primary transition-all duration-500">
+            <ArrowRight className="w-4 h-4 -rotate-45 group-hover:rotate-0 transition-transform duration-500" />
           </div>
         </div>
       </div>
