@@ -1,7 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion, useScroll, useSpring } from 'framer-motion';
 
-const navItems = [
+type NavItem = {
+  name: string;
+  href: string;
+  isButton?: boolean;
+};
+
+const navItems: NavItem[] = [
   { name: 'About', href: '#about' },
   { name: 'Experience', href: '#experience' },
   { name: 'Skills', href: '#skills' },
@@ -41,40 +47,32 @@ export function Navbar() {
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+    const target = document.querySelector(href);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
   return (
     <>
-      <header
-        className={`fixed top-0 w-full z-40 transition-all duration-500 ${isScrolled ? 'py-4' : 'py-6'
-          }`}
-        style={{
-          background: isScrolled ? 'rgba(8, 8, 8, 0.65)' : 'transparent',
-          backdropFilter: isScrolled ? 'blur(16px) saturate(180%)' : 'none',
-          WebkitBackdropFilter: isScrolled ? 'blur(16px) saturate(180%)' : 'none',
-          boxShadow: isScrolled ? '0 10px 30px -10px rgba(0, 0, 0, 0.5)' : 'none',
-        }}
-      >
-        <div className="container mx-auto px-6 md:px-12 flex justify-between items-center">
-          <a href="#home" onClick={(e) => handleClick(e, '#home')} className="text-xl font-display font-medium text-foreground tracking-wide hover:text-primary transition-colors">
-            DSK
-          </a>
-
-          <nav className="hidden md:flex gap-8 items-center">
+      <header className="fixed top-2.5 left-0 w-full z-50 px-6 hidden md:flex justify-center pointer-events-none">
+        <motion.div
+          initial={{ y: -100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+          className="flex items-center px-6 py-2 rounded-full border border-white/5 bg-black/30 backdrop-blur-md shadow-[0_8px_32px_0_rgba(0,0,0,0.8)] pointer-events-auto"
+        >
+          <nav className="flex gap-5 md:gap-7 items-center">
             {navItems.map((item) => (
               <a
                 key={item.name}
                 href={item.href}
                 onClick={(e) => !item.isButton && handleClick(e, item.href)}
                 className={`text-sm font-sans transition-all ${item.isButton
-                    ? 'px-4 py-2 border border-primary/50 rounded-full text-primary hover:bg-primary hover:text-background'
-                    : (activeSection === item.href.substring(1)
-                      ? 'text-primary'
-                      : 'text-muted-foreground hover:text-primary')
+                  ? 'px-4 py-2 border border-primary/50 rounded-full text-primary hover:bg-primary hover:text-background'
+                  : (activeSection === item.href.substring(1)
+                    ? 'text-primary'
+                    : 'text-muted-foreground hover:text-primary')
                   }`}
                 style={{ letterSpacing: '0.02em' }}
                 target={item.isButton ? "_blank" : undefined}
@@ -84,7 +82,7 @@ export function Navbar() {
               </a>
             ))}
           </nav>
-        </div>
+        </motion.div>
       </header>
     </>
   );

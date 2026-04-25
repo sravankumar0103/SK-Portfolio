@@ -6,20 +6,21 @@ import { Magnetic } from '../ui/Magnetic';
 
 export function Hero() {
   return (
-    <section id="home" className="relative h-screen w-full flex items-center overflow-hidden">
-      <div className="absolute inset-0 w-full md:w-1/2 md:right-0 md:left-auto right-0 z-0">
+    <section id="home" className="relative h-screen w-full flex flex-col md:flex-row items-center overflow-hidden">
+      {/* 3D Scene Container - Repositioned for Mobile */}
+      <div className="absolute top-[-5%] right-[-10%] w-[120%] h-[60%] md:top-0 md:right-0 md:w-1/2 md:h-full z-0 opacity-80 md:opacity-100">
         <HeroScene />
       </div>
 
-      <div className="relative z-10 w-full container mx-auto px-6 md:px-12 flex flex-col md:flex-row items-center mt-24">
-        <div className="w-full md:w-3/5 md:pr-12 pt-24 md:pt-0">
+      <div className="relative z-10 w-full container mx-auto px-6 md:px-12 flex flex-col justify-end md:justify-center h-full pb-[15vh] md:pt-20 md:pb-0">
+        <div className="w-full md:w-3/5 md:pr-12">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1 }}
             className="flex flex-col items-start"
           >
-            <h1 className="text-6xl md:text-8xl lg:text-9xl font-outfit font-semibold leading-[0.9] tracking-[-0.03em] mb-6">
+            <h1 className="text-[clamp(44px,10vw,120px)] font-outfit font-semibold leading-[1.05] md:leading-[0.9] tracking-[-0.03em] mb-4 md:mb-6">
               <div className="overflow-hidden">
                 <motion.span
                   initial={{ y: "100%" }}
@@ -50,16 +51,16 @@ export function Hero() {
             >
               <div className="w-24 h-[1px] bg-gradient-to-r from-primary/60 to-transparent mb-6" />
 
-              <h2 className="text-xl md:text-2xl font-sans font-medium gold-text uppercase tracking-[0.2em] mb-4">
+              <h2 className="text-lg md:text-2xl font-sans font-medium gold-text uppercase tracking-[0.2em] mb-3 md:mb-4">
                 AI & Full - Stack Developer
               </h2>
 
-              <p className="text-muted-foreground font-sans text-lg font-light mb-8">
+              <p className="text-muted-foreground font-sans text-base md:text-lg font-light mb-6 md:mb-8">
                 Hyderabad, India · Open to opportunities
               </p>
             </motion.div>
 
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-8 mb-8">
+            <div className="flex flex-row items-center gap-6 md:gap-8 mb-8">
               <Magnetic>
                 <a
                   href="#about"
@@ -67,7 +68,7 @@ export function Hero() {
                     e.preventDefault();
                     document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className="bg-primary text-background px-8 py-4 rounded-full font-sans text-sm uppercase tracking-widest hover:bg-white transition-colors flex items-center gap-2 group"
+                  className="bg-primary text-background px-[clamp(20px,4vw,32px)] py-[clamp(12px,2vw,16px)] rounded-full font-sans text-sm uppercase tracking-widest hover:bg-white transition-colors flex items-center gap-2 group"
                 >
                   Explore work
                   <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />

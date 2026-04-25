@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Github, Linkedin, Mail, Send, CheckCircle2, AlertCircle, Copy, Check } from 'lucide-react';
+import { Github, Linkedin, Mail, Send, CheckCircle2, AlertCircle, Copy, Check, ArrowUp } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useToast } from "@/hooks/use-toast";
+import { ScrollRevealText } from '../ui/ScrollRevealText';
 
 const contactSchema = z.object({
   name: z.string().min(2, 'Name is required'),
@@ -25,11 +26,40 @@ export function Contact() {
     resolver: zodResolver(contactSchema),
   });
 
-  const copyEmail = () => {
-    navigator.clipboard.writeText("sravankumar0103@gmail.com");
-    setCopied(true);
-    toast({ title: "Email copied!", description: "Address copied to clipboard." });
-    setTimeout(() => setCopied(false), 2000);
+  const copyEmail = async () => {
+    const email = 'sravankumar0103@gmail.com';
+    
+    try {
+      // Primary method: Modern Clipboard API
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(email);
+      } else {
+        // Fallback method: Hidden textarea (works on HTTP/Insecure contexts)
+        const textArea = document.createElement("textarea");
+        textArea.value = email;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-9999px";
+        textArea.style.top = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand('copy');
+        textArea.remove();
+      }
+      
+      setCopied(true);
+      toast({
+        title: "Email Copied!",
+        description: "My email has been copied to your clipboard.",
+      });
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: "Copy Failed",
+        description: "Please copy the email manually.",
+      });
+    }
   };
 
   const onSubmit = async (data: ContactFormValues) => {
@@ -68,7 +98,7 @@ export function Contact() {
   };
 
   return (
-    <section id="contact" className="pt-8 md:pt-12 pb-2 relative overflow-hidden">
+    <section id="contact" className="pt-4 md:pt-12 pb-2 relative overflow-hidden">
       <div className="container mx-auto px-6 md:px-12 relative z-10">
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-24 items-start">
 
@@ -80,65 +110,62 @@ export function Contact() {
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
             >
-              <span className="inline-block text-[10px] font-sans text-primary uppercase tracking-[0.6em] mb-6 border-b border-primary/20 pb-2">
+              <span className="inline-block text-[12px] font-sans text-primary uppercase tracking-[0.5em] mb-4 border-b border-primary/20 pb-2">
                 Get In Touch
               </span>
 
-              <h3 className="text-6xl md:text-8xl font-display font-medium text-foreground mb-8 tracking-tight leading-[0.95]">
+              <h3 className="text-4xl sm:text-6xl md:text-7xl font-display font-medium text-foreground mb-6 tracking-tight leading-[1.1] md:leading-[0.95]">
                 Let&apos;s build <br />
-                <motion.span
-                  className="gold-text italic"
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3, duration: 0.8 }}
-                >
-                  something
-                </motion.span> <br />
+                <ScrollRevealText 
+                  text="something" 
+                  to="hsl(11, 81%, 57%)" 
+                  from="rgba(255,255,255,0.1)"
+                  className="italic tracking-tight" 
+                /> <br />
                 great.
               </h3>
 
-              <p className="text-lg text-muted-foreground font-sans font-light mb-8 max-w-sm leading-relaxed opacity-80 text-reveal">
+              <p className="text-base text-muted-foreground font-sans font-light mb-8 md:mb-12 max-w-sm leading-relaxed opacity-70">
                 I am currently open to new opportunities and interesting collaborations. Let’s create something impactful together.
               </p>
 
-              <div className="space-y-6">
+              <div className="space-y-8">
                 <motion.div
                   className="group cursor-pointer inline-flex flex-col"
                   onClick={copyEmail}
                   whileHover={{ x: 5 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   <span className="text-[10px] font-sans text-muted-foreground uppercase tracking-[0.3em] mb-2 group-hover:text-primary transition-colors">
                     Direct Email
                   </span>
                   <div className="flex items-center gap-4">
-                    <span className="text-xl md:text-2xl font-sans text-foreground">
+                    <span className="text-lg sm:text-xl md:text-2xl font-sans text-foreground">
                       sravankumar0103@gmail.com
                     </span>
-                    <div className="w-8 h-8 rounded-full bg-white/[0.03] border border-white/10 flex items-center justify-center group-hover:bg-primary group-hover:text-background transition-all duration-300">
-                      {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                    </div>
+                    <motion.div 
+                      className="w-10 h-10 rounded-full bg-white/[0.03] border border-white/10 flex items-center justify-center group-hover:bg-primary group-hover:text-background transition-all duration-300"
+                      animate={copied ? { scale: [1, 1.2, 1] } : {}}
+                    >
+                      {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                    </motion.div>
                   </div>
                 </motion.div>
-
-                <div className="flex gap-4 pt-4">
-                  <SocialIcon href="https://github.com/sravankumar0103" icon={<Github className="w-5 h-5" />} />
-                  <SocialIcon href="https://linkedin.com/in/diddi-sravan-kumar" icon={<Linkedin className="w-5 h-5" />} />
-                </div>
               </div>
             </motion.div>
           </div>
 
           {/* Form Side (Right) */}
-          <div className="lg:col-span-6 lg:ml-auto lg:pt-20">
+          <div className="lg:col-span-7 pt-4 md:pt-12">
             <motion.div
               initial={{ opacity: 0, scale: 0.98 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="premium-card rounded-[2rem] p-6 md:p-8 relative max-w-md ml-auto"
+              className="premium-card rounded-2xl md:rounded-[2.5rem] p-5 md:p-12 relative w-full max-w-[92%] mx-auto lg:max-w-xl lg:ml-auto"
             >
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-                <div className="grid md:grid-cols-2 gap-8">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 md:space-y-8">
+                <div className="grid md:grid-cols-2 gap-6 md:gap-8">
                   <div className="relative group">
                     <input
                       {...register('name')}
@@ -211,12 +238,31 @@ export function Contact() {
             </motion.div>
           </div>
         </div>
+
+        {/* New Action Row (Full Width) */}
+        <div className="flex justify-between items-center mt-10 md:mt-16 pt-8 border-t border-white/5">
+          <div className="flex gap-4">
+            <SocialIcon href="https://github.com/sravankumar0103" icon={<Github className="w-5 h-5" />} />
+            <SocialIcon href="https://linkedin.com/in/diddi-sravan-kumar" icon={<Linkedin className="w-5 h-5" />} />
+          </div>
+
+          <motion.button
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-primary hover:text-background hover:bg-primary hover:border-primary transition-all duration-500 group shadow-lg"
+            whileHover={{ y: -5, scale: 1.1 }}
+            title="Back to top"
+          >
+            <ArrowUp className="w-5 h-5 group-hover:-translate-y-1 transition-transform duration-300" />
+          </motion.button>
+        </div>
       </div>
 
       <footer className="mt-6 pb-6 border-t border-white/5 pt-6 text-center">
-        <p className="text-[9px] font-sans text-muted-foreground uppercase tracking-[0.8em] opacity-40">
-          © {new Date().getFullYear()} Diddi Sravan Kumar · Digital Portfolio
-        </p>
+        <div className="text-[10px] font-sans text-muted-foreground uppercase tracking-[0.3em] opacity-50 leading-relaxed flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3">
+          <span>© {new Date().getFullYear()} SRAVAN KUMAR DIDDI</span>
+          <span className="hidden md:inline-block opacity-30">·</span>
+          <span>DIGITAL PORTFOLIO</span>
+        </div>
       </footer>
     </section>
   );

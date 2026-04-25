@@ -34,7 +34,7 @@ export function About() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="grid grid-cols-2 gap-x-8 gap-y-12"
+            className="grid grid-cols-2 gap-4 sm:gap-8 md:gap-x-8 md:gap-y-12 mt-8 md:mt-0"
           >
             <Stat label="CGPA" value="7.45" />
             <Stat label="Projects" value="4+" />

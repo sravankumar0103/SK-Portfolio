@@ -787,6 +787,16 @@
   background-clip: text;
 }
 
+section {
+  scroll-margin-top: 100px;
+}
+
+@media (max-width: 768px) {
+  section {
+    scroll-margin-top: 80px;
+  }
+}
+
 .premium-gradient-text {
   background: linear-gradient(to right, #ffffff 0%, #ffffff 65%, hsl(11, 81%, 57%) 100%);
   -webkit-background-clip: text;

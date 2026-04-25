@@ -15,8 +15,8 @@ export function SectionHeading({ num, title }: SectionHeadingProps) {
         transition={{ duration: 0.7 }}
         className="flex items-baseline gap-6"
       >
-        <span className="text-lg font-sans font-light text-muted-foreground uppercase tracking-widest">{num} —</span>
-        <h2 className="text-4xl md:text-5xl font-display font-bold text-foreground tracking-tight">
+        <span className="text-sm md:text-lg font-sans font-light text-muted-foreground uppercase tracking-widest">{num} —</span>
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-foreground tracking-tight">
           {title}
         </h2>
       </motion.div>
