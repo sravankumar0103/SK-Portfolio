@@ -68,11 +68,7 @@ export function Contact() {
   };
 
   return (
-    <section id="contact" className="py-24 md:py-48 relative overflow-hidden">
-      {/* Refined background elements */}
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/3 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-primary/2 rounded-full blur-[100px] pointer-events-none" />
-
+    <section id="contact" className="pt-8 md:pt-12 pb-2 relative overflow-hidden">
       <div className="container mx-auto px-6 md:px-12 relative z-10">
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-24 items-start">
 
@@ -84,11 +80,11 @@ export function Contact() {
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
             >
-              <span className="inline-block text-[10px] font-sans text-primary uppercase tracking-[0.6em] mb-12 border-b border-primary/20 pb-2">
+              <span className="inline-block text-[10px] font-sans text-primary uppercase tracking-[0.6em] mb-6 border-b border-primary/20 pb-2">
                 Get In Touch
               </span>
 
-              <h3 className="text-6xl md:text-8xl font-display font-medium text-foreground mb-12 tracking-tight leading-[0.95]">
+              <h3 className="text-6xl md:text-8xl font-display font-medium text-foreground mb-8 tracking-tight leading-[0.95]">
                 Let&apos;s build <br />
                 <motion.span
                   className="gold-text italic"
@@ -101,17 +97,17 @@ export function Contact() {
                 great.
               </h3>
 
-              <p className="text-lg text-muted-foreground font-sans font-light mb-16 max-w-sm leading-relaxed opacity-80">
+              <p className="text-lg text-muted-foreground font-sans font-light mb-8 max-w-sm leading-relaxed opacity-80 text-reveal">
                 I am currently open to new opportunities and interesting collaborations. Let’s create something impactful together.
               </p>
 
-              <div className="space-y-8">
+              <div className="space-y-6">
                 <motion.div
                   className="group cursor-pointer inline-flex flex-col"
                   onClick={copyEmail}
                   whileHover={{ x: 5 }}
                 >
-                  <span className="text-[10px] font-sans text-muted-foreground uppercase tracking-[0.3em] mb-3 group-hover:text-primary transition-colors">
+                  <span className="text-[10px] font-sans text-muted-foreground uppercase tracking-[0.3em] mb-2 group-hover:text-primary transition-colors">
                     Direct Email
                   </span>
                   <div className="flex items-center gap-4">
@@ -124,7 +120,7 @@ export function Contact() {
                   </div>
                 </motion.div>
 
-                <div className="flex gap-4 pt-6">
+                <div className="flex gap-4 pt-4">
                   <SocialIcon href="https://github.com/sravankumar0103" icon={<Github className="w-5 h-5" />} />
                   <SocialIcon href="https://linkedin.com/in/diddi-sravan-kumar" icon={<Linkedin className="w-5 h-5" />} />
                 </div>
@@ -133,7 +129,7 @@ export function Contact() {
           </div>
 
           {/* Form Side (Right) */}
-          <div className="lg:col-span-6 lg:ml-auto lg:pt-32">
+          <div className="lg:col-span-6 lg:ml-auto lg:pt-20">
             <motion.div
               initial={{ opacity: 0, scale: 0.98 }}
               whileInView={{ opacity: 1, scale: 1 }}
@@ -217,7 +213,7 @@ export function Contact() {
         </div>
       </div>
 
-      <footer className="mt-48 pb-12 border-t border-white/5 pt-12 text-center">
+      <footer className="mt-6 pb-6 border-t border-white/5 pt-6 text-center">
         <p className="text-[9px] font-sans text-muted-foreground uppercase tracking-[0.8em] opacity-40">
           © {new Date().getFullYear()} Diddi Sravan Kumar · Digital Portfolio
         </p>

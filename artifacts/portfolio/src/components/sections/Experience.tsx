@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { SectionHeading } from '../ui/SectionHeading';
+import { ScrollRevealText } from '../ui/ScrollRevealText';
 
 const experiences = [
   {
@@ -18,7 +19,7 @@ const experiences = [
 
 export function Experience() {
   return (
-    <section id="experience" className="py-24 md:py-32 relative">
+    <section id="experience" className="py-12 md:py-20 relative">
       <div className="container mx-auto px-6 md:px-12">
         <SectionHeading num="02" title="Experience" />
         
@@ -49,7 +50,7 @@ function ExperienceItem({ data, index }: { data: any, index: number }) {
       className={`relative flex flex-col md:flex-row gap-8 md:gap-16 group ${isEven ? 'md:flex-row-reverse' : ''}`}
     >
       {/* Timeline dot */}
-      <div className="absolute -left-[5px] md:left-1/2 md:-ml-[5px] top-2 w-2.5 h-2.5 rounded-full bg-primary shadow-[0_0_10px_rgba(201,169,110,0.5)] z-10" />
+      <div className="absolute -left-[5px] md:left-1/2 md:-ml-[5px] top-2 w-2.5 h-2.5 rounded-full bg-primary shadow-[0_0_10px_hsla(11,81%,57%,0.5)] z-10" />
       
       {/* Date */}
       <div className={`hidden md:flex w-1/2 flex-col pt-1 ${isEven ? 'items-start text-left' : 'items-end text-right'}`}>
@@ -59,7 +60,9 @@ function ExperienceItem({ data, index }: { data: any, index: number }) {
       {/* Content Card */}
       <div className={`w-full md:w-1/2 ${isEven ? 'text-right' : 'text-left'}`}>
         <div className="group-hover:translate-x-1 transition-transform duration-300">
-          <h3 className="text-xl md:text-2xl font-display font-medium text-foreground mb-1">{data.company}</h3>
+          <h3 className="text-2xl md:text-4xl font-display font-bold text-foreground mb-1 tracking-tighter">
+            <ScrollRevealText text={data.company} />
+          </h3>
           <div className="text-base font-sans font-medium text-foreground/80 mb-2">{data.role}</div>
           <span className="md:hidden block text-xs font-sans text-muted-foreground uppercase tracking-widest mb-4">{data.date}</span>
           
