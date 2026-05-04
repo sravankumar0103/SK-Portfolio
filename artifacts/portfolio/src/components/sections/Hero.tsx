@@ -77,7 +77,7 @@ export function Hero() {
 
               <Magnetic>
                 <a
-                  href="https://drive.google.com/file/d/14N9CnZETI_vo2GAS003vhxhAx6PYNKXE/view?usp=sharing"
+                  href="https://drive.google.com/file/d/1FYafM1kLa7HjkBhlbMHYuurJAcEY0n38/view?usp=sharing"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-primary hover:text-foreground transition-colors font-sans text-sm uppercase tracking-widest flex items-center gap-2 group relative pb-1"

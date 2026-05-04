@@ -55,9 +55,9 @@ function ProjectRow({ project, index }: { project: any, index: number }) {
   return (
     <motion.div
       initial={{ opacity: 1, y: 0, scale: 0.95 }}
-      whileInView={{ 
-        opacity: 1, 
-        y: 0, 
+      whileInView={{
+        opacity: 1,
+        y: 0,
         scale: 1,
         transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1] }
       }}
@@ -89,12 +89,12 @@ function ProjectRow({ project, index }: { project: any, index: number }) {
             </div>
           </div>
 
-          <motion.div 
+          <motion.div
             className="overflow-hidden"
             initial={{ height: 0, opacity: 0 }}
             whileInView={{ height: "auto", opacity: 1 }}
             viewport={{ once: false, margin: "-30% 0px -30% 0px" }}
-            transition={{ 
+            transition={{
               height: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
               opacity: { duration: 0.5, delay: 0.2 }
             }}

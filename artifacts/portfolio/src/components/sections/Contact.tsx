@@ -247,7 +247,35 @@ export function Contact() {
           </div>
 
           <motion.button
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            onClick={() => {
+              // Cancel any existing navbar scroll loops
+              if ((window as any)._cancelScroll) (window as any)._cancelScroll();
+              
+              let isScrolling = true;
+              const interrupt = () => { isScrolling = false; };
+              window.addEventListener('wheel', interrupt, { passive: true, once: true });
+              window.addEventListener('touchstart', interrupt, { passive: true, once: true });
+              
+              const smoothScrollTop = () => {
+                if (!isScrolling) return;
+                
+                const currentY = window.scrollY;
+                if (currentY <= 2) {
+                  window.scrollTo(0, 0);
+                  window.removeEventListener('wheel', interrupt);
+                  window.removeEventListener('touchstart', interrupt);
+                  return;
+                }
+                
+                // Move 15% of the distance to top per frame
+                const move = Math.max(currentY * 0.15, 1);
+                window.scrollBy(0, -move);
+                
+                requestAnimationFrame(smoothScrollTop);
+              };
+              
+              requestAnimationFrame(smoothScrollTop);
+            }}
             className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-primary hover:text-background hover:bg-primary hover:border-primary transition-all duration-500 group shadow-lg"
             whileHover={{ y: -5, scale: 1.1 }}
             title="Back to top"
