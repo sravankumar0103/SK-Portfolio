@@ -1,5 +1,7 @@
-import { motion } from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
 import { SectionHeading } from '../ui/SectionHeading';
+import { ScrollRevealText } from '../ui/ScrollRevealText';
 import { ArrowRight, Github, ExternalLink } from 'lucide-react';
 
 const projects = [
@@ -51,9 +53,12 @@ export function Projects() {
 
 function ProjectRow({ project, index }: { project: any, index: number }) {
   const num = (index + 1).toString().padStart(2, '0');
+  const ref = useRef(null);
+  const isInView = useInView(ref, { margin: "-30% 0px -30% 0px" });
 
   return (
     <motion.div
+      ref={ref}
       initial={{ opacity: 1, y: 0, scale: 0.95 }}
       whileInView={{
         opacity: 1,
@@ -76,8 +81,14 @@ function ProjectRow({ project, index }: { project: any, index: number }) {
 
         <div className="flex-1">
           <div className="flex flex-col gap-3">
-            <h3 className="text-2xl sm:text-3xl md:text-5xl font-display font-medium text-foreground/90 group-hover:text-foreground transition-all duration-500 group-hover:tracking-tight">
-              {project.title}
+            <h3 className="text-2xl sm:text-3xl md:text-5xl font-display font-medium transition-all duration-500 group-hover:tracking-tight">
+              <ScrollRevealText 
+                text={project.title}
+                isActive={isInView}
+                from="rgba(255, 255, 255, 0.1)"
+                to="hsl(11, 81%, 57%)"
+                characterClassName="group-hover:!text-foreground"
+              />
             </h3>
 
             <div className="flex flex-wrap gap-2">
@@ -112,17 +123,18 @@ function ProjectRow({ project, index }: { project: any, index: number }) {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: false, margin: "-30% 0px -30% 0px" }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="flex items-center gap-2"
+            className="flex items-center gap-3"
           >
             {project.github && (
               <a
                 href={project.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-1.5 text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-110"
+                className="flex items-center gap-2 px-2.5 py-1 text-muted-foreground hover:text-primary transition-all duration-300 hover:bg-white/[0.03] rounded-full border border-white/5 hover:border-primary/20 group/code"
                 onClick={(e) => e.stopPropagation()}
               >
-                <Github className="w-4 h-4" />
+                <span className="text-[9px] font-sans font-semibold uppercase tracking-widest opacity-70 group-hover/code:opacity-100 transition-opacity">Code</span>
+                <Github className="w-3.5 h-3.5" />
               </a>
             )}
             {project.live && project.live !== '#' && (
@@ -130,10 +142,11 @@ function ProjectRow({ project, index }: { project: any, index: number }) {
                 href={project.live}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-1.5 text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-110"
+                className="flex items-center gap-2 px-2.5 py-1 text-muted-foreground hover:text-primary transition-all duration-300 hover:bg-white/[0.03] rounded-full border border-white/5 hover:border-primary/20 group/live"
                 onClick={(e) => e.stopPropagation()}
               >
-                <ExternalLink className="w-4 h-4" />
+                <span className="text-[9px] font-sans font-semibold uppercase tracking-widest opacity-70 group-hover/live:opacity-100 transition-opacity">Live</span>
+                <ExternalLink className="w-3.5 h-3.5" />
               </a>
             )}
           </motion.div>

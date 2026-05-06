@@ -1,4 +1,5 @@
-import { motion } from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
 import { SectionHeading } from '../ui/SectionHeading';
 import { ScrollRevealText } from '../ui/ScrollRevealText';
 
@@ -40,9 +41,12 @@ export function Experience() {
 
 function ExperienceItem({ data, index }: { data: any, index: number }) {
   const isEven = index % 2 === 0;
+  const ref = useRef(null);
+  const isInView = useInView(ref, { margin: "-30% 0px -30% 0px" });
 
   return (
     <motion.div
+      ref={ref}
       initial={{ opacity: 1, y: 0, scale: 0.95 }}
       whileInView={{
         opacity: 1,
@@ -65,7 +69,7 @@ function ExperienceItem({ data, index }: { data: any, index: number }) {
       <div className={`w-full md:w-1/2 pl-6 md:pl-0 ${isEven ? 'md:text-right' : 'md:text-left'}`}>
         <div className="group-hover:translate-x-1 transition-transform duration-300">
           <h3 className="text-xl sm:text-2xl md:text-4xl font-display font-bold text-foreground mb-1 tracking-tighter">
-            <ScrollRevealText text={data.company} />
+            <ScrollRevealText text={data.company} isActive={isInView} />
           </h3>
           <div className="text-base font-sans font-medium text-foreground/80 mb-2">{data.role}</div>
           <span className="md:hidden block text-xs font-sans text-muted-foreground uppercase tracking-widest mb-4">{data.date}</span>
