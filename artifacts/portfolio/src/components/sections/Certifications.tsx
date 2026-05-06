@@ -45,24 +45,34 @@ export function Certifications() {
               >
                 <div className="absolute bottom-0 left-0 h-[1px] w-0 bg-primary group-hover:w-full transition-all duration-500 ease-out" />
 
-                <div className="mb-2 md:mb-0 pr-8">
-                  <div className="flex items-center gap-3">
-                    <h3 className="text-xl font-sans font-medium text-foreground group-hover:text-primary transition-colors">
-                      {cert.name}
-                    </h3>
-                    {cert.link && (
-                      <div className="text-muted-foreground group-hover:text-primary opacity-0 group-hover:opacity-100 transition-all duration-300">
-                        <ExternalLink className="w-4 h-4" />
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-sm font-sans text-muted-foreground mt-1">
+                <div className="flex-1 pr-4">
+                  <h3 className="text-lg md:text-xl font-sans font-medium text-foreground group-hover:text-primary transition-colors leading-tight">
+                    {cert.name}
+                  </h3>
+                  <p className="text-sm font-sans text-muted-foreground mt-1.5">
                     {cert.issuer}
                   </p>
-                </div>
-
-                <div className="text-sm font-sans text-muted-foreground uppercase tracking-widest shrink-0">
-                  {cert.date}
+                  
+                  <div className="flex items-center justify-between mt-4">
+                    <div className="text-sm font-sans text-muted-foreground uppercase tracking-widest">
+                      {cert.date}
+                    </div>
+                    
+                    <motion.div
+                      initial={{ opacity: 0, x: 20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: false, margin: "-30% 0px -30% 0px" }}
+                      transition={{ duration: 0.5, delay: 0.1 }}
+                      className="shrink-0"
+                    >
+                      {cert.link && (
+                        <div className="flex items-center gap-2 px-2.5 py-1 text-muted-foreground hover:text-primary bg-white/[0.03] rounded-full border border-white/5 hover:border-primary/20 transition-all duration-300">
+                          <span className="text-[9px] font-sans font-semibold uppercase tracking-widest">View</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </div>
+                      )}
+                    </motion.div>
+                  </div>
                 </div>
               </a>
             </motion.div>
