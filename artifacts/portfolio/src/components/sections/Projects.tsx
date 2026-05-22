@@ -6,10 +6,17 @@ import { ArrowRight, Github, ExternalLink } from 'lucide-react';
 
 const projects = [
   {
-    title: "Hexapod Robotic Arm",
-    description: "Integrated a robotic arm into a 16-DOF hexapod robot for real-time object manipulation and automated task execution. Utilized AI, ML, and Computer Vision for adaptive autonomous behavior. Included an AR-based interface for real-time visualization.",
-    tech: ["Python", "OpenCV", "TensorFlow", "Raspberry Pi 5"],
-    github: "https://github.com/sravankumar0103",
+    title: "ArogyaLens",
+    description: "An AI-powered medical document decoder designed to bridge the healthcare literacy gap. It utilizes OCR, LLMs, and TTS to instantly translate complex prescriptions and lab reports into ultra-simple, multilingual audio summaries with built-in drug safety checks.",
+    tech: ["React", "LLM APIs", "OCR", "OpenFDA"],
+    github: "https://github.com/sravankumar0103/ArogyaLens",
+    live: "#"
+  },
+  {
+    title: "CRM Dashboard - Nuzividu Mangoes",
+    description: "A comprehensive, full-stack Customer Relationship Management (CRM) platform built as a freelance project for Nuzividu Mangoes. It digitizes the end-to-end sales pipeline—handling leads, follow-ups, inventory, and finances—while featuring integrated analytics and AI-driven campaign tools.",
+    tech: ["React", "TypeScript", "Express.js", "Supabase"],
+    github: "https://github.com/sravankumar0103/AdminDashboard-NuzividuMangoes",
     live: "#"
   },
   {
@@ -20,9 +27,9 @@ const projects = [
     live: "https://vaultix-sk.vercel.app/"
   },
   {
-    title: "Web App Suite",
-    description: "A collection of interactive web applications built during virtual internship, including a responsive landing page, Tic-Tac-Toe game, and a Stopwatch tool.",
-    tech: ["HTML5", "CSS3", "JavaScript"],
+    title: "Hexapod Robotic Arm",
+    description: "Integrated a robotic arm into a 16-DOF hexapod robot for real-time object manipulation and automated task execution. Utilized AI, ML, and Computer Vision for adaptive autonomous behavior. Included an AR-based interface for real-time visualization.",
+    tech: ["Python", "OpenCV", "TensorFlow", "Raspberry Pi 5"],
     github: "https://github.com/sravankumar0103",
     live: "#"
   },
@@ -30,6 +37,13 @@ const projects = [
     title: "Python Utilities",
     description: "Suite of Python utility applications focusing on logic and automation: Word Counter, Expense Tracker, and a Username Generator.",
     tech: ["Python", "Automation Scripts"],
+    github: "https://github.com/sravankumar0103",
+    live: "#"
+  },
+  {
+    title: "Web App Suite",
+    description: "A collection of interactive web applications built during virtual internship, including a responsive landing page, Tic-Tac-Toe game, and a Stopwatch tool.",
+    tech: ["HTML5", "CSS3", "JavaScript"],
     github: "https://github.com/sravankumar0103",
     live: "#"
   }
