@@ -3,8 +3,20 @@ import { motion } from 'framer-motion';
 import { HeroScene } from '../3d/HeroScene';
 import { Github, Linkedin, Mail, ArrowRight } from 'lucide-react';
 import { Magnetic } from '../ui/Magnetic';
+import { useSanitySiteSettings } from '../../lib/sanityQueries';
+
+// Fallback content — used if Sanity is empty, loading, or unreachable.
+const FALLBACK_RESUME_URL =
+  'https://drive.google.com/file/d/1FYafM1kLa7HjkBhlbMHYuurJAcEY0n38/view?usp=sharing';
 
 export function Hero() {
+  const { data: settings } = useSanitySiteSettings();
+  const firstName = settings?.heroFirstName || 'Sravan Kumar';
+  const lastName = settings?.heroLastName || 'Diddi';
+  const role = settings?.heroRole || 'AI & Full - Stack Developer';
+  const location = settings?.heroLocation || 'Hyderabad, India · Open to opportunities';
+  const resumeHref = settings?.resumeFileUrl || settings?.resumeUrl || FALLBACK_RESUME_URL;
+
   return (
     <section id="home" className="relative h-screen w-full flex flex-col md:flex-row items-center overflow-hidden">
       {/* 3D Scene Container - Repositioned for Mobile */}
@@ -28,7 +40,7 @@ export function Hero() {
                   transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
                   className="block whitespace-nowrap premium-gradient-text"
                 >
-                  Sravan Kumar
+                  {firstName}
                 </motion.span>
               </div>
               <div className="overflow-hidden">
@@ -38,7 +50,7 @@ export function Hero() {
                   transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
                   className="block premium-gradient-text"
                 >
-                  Diddi
+                  {lastName}
                 </motion.span>
               </div>
             </h1>
@@ -52,11 +64,11 @@ export function Hero() {
               <div className="w-24 h-[1px] bg-gradient-to-r from-primary/60 to-transparent mb-6" />
 
               <h2 className="text-lg md:text-2xl font-sans font-medium gold-text uppercase tracking-[0.2em] mb-3 md:mb-4">
-                AI & Full - Stack Developer
+                {role}
               </h2>
 
               <p className="text-muted-foreground font-sans text-base md:text-lg font-light mb-6 md:mb-8">
-                Hyderabad, India · Open to opportunities
+                {location}
               </p>
             </motion.div>
 
@@ -77,7 +89,7 @@ export function Hero() {
 
               <Magnetic>
                 <a
-                  href="https://drive.google.com/file/d/1FYafM1kLa7HjkBhlbMHYuurJAcEY0n38/view?usp=sharing"
+                  href={resumeHref}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-primary hover:text-foreground transition-colors font-sans text-sm uppercase tracking-widest flex items-center gap-2 group relative pb-1"

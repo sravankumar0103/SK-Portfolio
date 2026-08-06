@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion';
 import { ExternalLink } from 'lucide-react';
 import { SectionHeading } from '../ui/SectionHeading';
+import { useSanityCertifications } from '../../lib/sanityQueries';
 
-const certs = [
+// Fallback content — used if Sanity is empty, loading, or unreachable.
+const fallbackCerts = [
   {
     name: "Google Cybersecurity",
     issuer: "Google / Coursera",
@@ -22,6 +24,9 @@ const certs = [
 ];
 
 export function Certifications() {
+  const { data } = useSanityCertifications();
+  const certs = data && data.length ? data : fallbackCerts;
+
   return (
     <section id="certifications" className="py-12 md:py-20 relative">
       <div className="container mx-auto px-6 md:px-12">

@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion';
 import { SectionHeading } from '../ui/SectionHeading';
 import { ScrollRevealText } from '../ui/ScrollRevealText';
+import { useSanitySkills } from '../../lib/sanityQueries';
 
-const skills = [
+// Fallback content — used if Sanity is empty, loading, or unreachable.
+const fallbackSkills = [
   {
     category: "Languages",
     items: ["Python", "Java", "SQL", "JavaScript", "HTML5", "CSS3"]
@@ -18,6 +20,9 @@ const skills = [
 ];
 
 export function Skills() {
+  const { data } = useSanitySkills();
+  const skills = data && data.length ? data : fallbackSkills;
+
   return (
     <section id="skills" className="py-12 md:py-20 relative">
       <div className="container mx-auto px-6 md:px-12">
@@ -38,7 +43,7 @@ export function Skills() {
               </h3>
               
               <div className="w-full md:w-2/3 flex flex-wrap gap-3">
-                {group.items.map((skill) => (
+                {(group.items || []).map((skill) => (
                   <span
                     key={skill}
                     className="px-4 py-2 text-sm font-sans text-foreground bg-white/[0.03] border border-white/[0.1] hover:border-primary/50 hover:text-primary transition-all duration-300 rounded-full cursor-default hover:shadow-[0_0_15px_hsla(11,81%,57%,0.18)]"
