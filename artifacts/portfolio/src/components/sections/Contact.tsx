@@ -1,11 +1,30 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Github, Linkedin, Mail, Send, CheckCircle2, AlertCircle, Copy, Check, ArrowUp } from 'lucide-react';
+import { Github, Linkedin, Mail, Send, CheckCircle2, AlertCircle, Copy, Check, ArrowUp, Twitter, Instagram, Globe } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useToast } from "@/hooks/use-toast";
 import { ScrollRevealText } from '../ui/ScrollRevealText';
+import { useSanitySiteSettings } from '../../lib/sanityQueries';
+
+// Fallback content — used if Sanity is empty, loading, or unreachable.
+const FALLBACK_EMAIL = 'sravankumar0103@gmail.com';
+const fallbackSocials = [
+  { platform: 'github', url: 'https://github.com/sravankumar0103' },
+  { platform: 'linkedin', url: 'https://linkedin.com/in/diddi-sravan-kumar' },
+];
+
+function iconForPlatform(platform?: string): React.ReactNode {
+  switch (platform) {
+    case 'github': return <Github className="w-5 h-5" />;
+    case 'linkedin': return <Linkedin className="w-5 h-5" />;
+    case 'email': return <Mail className="w-5 h-5" />;
+    case 'twitter': return <Twitter className="w-5 h-5" />;
+    case 'instagram': return <Instagram className="w-5 h-5" />;
+    default: return <Globe className="w-5 h-5" />;
+  }
+}
 
 const contactSchema = z.object({
   name: z.string().min(2, 'Name is required'),
@@ -21,14 +40,15 @@ export function Contact() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
+  const { data: settings } = useSanitySiteSettings();
+  const email = settings?.contactEmail || FALLBACK_EMAIL;
+  const socials = settings?.socials && settings.socials.length ? settings.socials : fallbackSocials;
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<ContactFormValues>({
     resolver: zodResolver(contactSchema),
   });
 
   const copyEmail = async () => {
-    const email = 'sravankumar0103@gmail.com';
-    
     try {
       // Primary method: Modern Clipboard API
       if (navigator.clipboard && window.isSecureContext) {
@@ -141,7 +161,7 @@ export function Contact() {
                   </span>
                   <div className="flex items-center gap-4">
                     <span className="text-lg sm:text-xl md:text-2xl font-sans text-foreground">
-                      sravankumar0103@gmail.com
+                      {email}
                     </span>
                     <motion.div 
                       className="w-10 h-10 rounded-full bg-white/[0.03] border border-white/10 flex items-center justify-center group-hover:bg-primary group-hover:text-background transition-all duration-300"
@@ -242,8 +262,11 @@ export function Contact() {
         {/* New Action Row (Full Width) */}
         <div className="flex justify-between items-center mt-10 md:mt-16 pt-8 border-t border-white/5">
           <div className="flex gap-4">
-            <SocialIcon href="https://github.com/sravankumar0103" icon={<Github className="w-5 h-5" />} />
-            <SocialIcon href="https://linkedin.com/in/diddi-sravan-kumar" icon={<Linkedin className="w-5 h-5" />} />
+            {socials
+              .filter((s) => s.url)
+              .map((s, i) => (
+                <SocialIcon key={s.url || i} href={s.url as string} icon={iconForPlatform(s.platform)} />
+              ))}
           </div>
 
           <motion.button

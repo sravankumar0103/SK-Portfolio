@@ -3,8 +3,10 @@ import { motion, useInView } from 'framer-motion';
 import { SectionHeading } from '../ui/SectionHeading';
 import { ScrollRevealText } from '../ui/ScrollRevealText';
 import { ArrowRight, Github, ExternalLink } from 'lucide-react';
+import { useSanityProjects } from '../../lib/sanityQueries';
 
-const projects = [
+// Fallback content — used if Sanity is empty, loading, or unreachable.
+const fallbackProjects = [
   {
     title: "ArogyaLens",
     description: "An AI-powered medical document decoder designed to bridge the healthcare literacy gap. It utilizes OCR, LLMs, and TTS to instantly translate complex prescriptions and lab reports into ultra-simple, multilingual audio summaries with built-in drug safety checks.",
@@ -50,6 +52,9 @@ const projects = [
 ];
 
 export function Projects() {
+  const { data } = useSanityProjects();
+  const projects = data && data.length ? data : fallbackProjects;
+
   return (
     <section id="projects" className="py-12 md:py-20 relative">
       <div className="container mx-auto px-6 md:px-12">
@@ -106,7 +111,7 @@ function ProjectRow({ project, index }: { project: any, index: number }) {
             </h3>
 
             <div className="flex flex-wrap gap-2">
-              {project.tech.map((t: string) => (
+              {(project.tech || []).map((t: string) => (
                 <span key={t} className="text-[9px] font-sans text-muted-foreground uppercase tracking-[0.2em] px-2.5 py-0.5 bg-white/[0.03] border border-white/5 rounded-full group-hover:border-primary/20 transition-colors">
                   {t}
                 </span>

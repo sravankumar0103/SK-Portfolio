@@ -2,8 +2,10 @@ import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { SectionHeading } from '../ui/SectionHeading';
 import { ScrollRevealText } from '../ui/ScrollRevealText';
+import { useSanityExperience } from '../../lib/sanityQueries';
 
-const experiences = [
+// Fallback content — used if Sanity is empty, loading, or unreachable.
+const fallbackExperiences = [
   {
     role: "Python Programming Intern",
     company: "MotionCut",
@@ -19,6 +21,9 @@ const experiences = [
 ];
 
 export function Experience() {
+  const { data } = useSanityExperience();
+  const experiences = data && data.length ? data : fallbackExperiences;
+
   return (
     <section id="experience" className="py-12 md:py-20 relative">
       <div className="container mx-auto px-6 md:px-12">
