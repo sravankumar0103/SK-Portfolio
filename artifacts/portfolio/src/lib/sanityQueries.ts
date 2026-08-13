@@ -16,16 +16,65 @@ export interface SanityProject {
   github?: string;
   live?: string;
   imageUrl?: string;
+  hasDetailPage?: boolean;
+  slug?: string;
 }
 
 const projectsQuery = `*[_type == "project" && visible != false]|order(order asc, _createdAt asc){
-  title, description, tech, github, live, "imageUrl": image.asset->url
+  title, description, tech, github, live, "imageUrl": image.asset->url,
+  hasDetailPage, "slug": slug.current
 }`;
 
 export function useSanityProjects() {
   return useQuery({
     queryKey: ['sanity', 'projects'],
     queryFn: () => sanityFetch<SanityProject[]>(projectsQuery),
+    staleTime: STALE_TIME,
+    retry: 1,
+  });
+}
+
+// ---------- Single project (detail / blog page) ----------
+export interface SanityImage {
+  url?: string;
+  caption?: string;
+}
+
+export interface SanityProjectDetail {
+  title: string;
+  description: string;
+  tech?: string[];
+  github?: string;
+  live?: string;
+  slug?: string;
+  overview?: string;
+  client?: string;
+  role?: string;
+  timeline?: string;
+  coverImageUrl?: string;
+  // Portable Text blocks; typed loosely to avoid a hard dependency on internal types.
+  body?: any[];
+  gallery?: SanityImage[];
+  outcomes?: string[];
+}
+
+const projectDetailQuery = `*[_type == "project" && slug.current == $slug && hasDetailPage == true][0]{
+  title, description, tech, github, live, "slug": slug.current,
+  overview, client, role, timeline,
+  "coverImageUrl": coverImage.asset->url,
+  body[]{
+    ...,
+    _type == "image" => { "url": asset->url, caption }
+  },
+  "gallery": gallery[]{ "url": asset->url, caption },
+  outcomes
+}`;
+
+export function useSanityProject(slug: string | undefined) {
+  return useQuery({
+    queryKey: ['sanity', 'project', slug],
+    queryFn: () => sanityFetch<SanityProjectDetail | null>(projectDetailQuery, { slug: slug! }),
+    enabled: !!slug,
     staleTime: STALE_TIME,
     retry: 1,
   });

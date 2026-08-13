@@ -1,55 +1,11 @@
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
+import { Link } from 'wouter';
 import { SectionHeading } from '../ui/SectionHeading';
 import { ScrollRevealText } from '../ui/ScrollRevealText';
 import { ArrowRight, Github, ExternalLink } from 'lucide-react';
 import { useSanityProjects } from '../../lib/sanityQueries';
-
-// Fallback content — used if Sanity is empty, loading, or unreachable.
-const fallbackProjects = [
-  {
-    title: "ArogyaLens",
-    description: "An AI-powered medical document decoder designed to bridge the healthcare literacy gap. It utilizes OCR, LLMs, and TTS to instantly translate complex prescriptions and lab reports into ultra-simple, multilingual audio summaries with built-in drug safety checks.",
-    tech: ["React", "LLM APIs", "OCR", "OpenFDA"],
-    github: "https://github.com/sravankumar0103/ArogyaLens",
-    live: "#"
-  },
-  {
-    title: "CRM Dashboard - Nuzividu Mangoes",
-    description: "A comprehensive, full-stack Customer Relationship Management (CRM) platform built as a freelance project for Nuzividu Mangoes. It digitizes the end-to-end sales pipeline—handling leads, follow-ups, inventory, and finances—while featuring integrated analytics and AI-driven campaign tools.",
-    tech: ["React", "TypeScript", "Express.js", "Supabase"],
-    github: "https://github.com/sravankumar0103/AdminDashboard-NuzividuMangoes",
-    live: "#"
-  },
-  {
-    title: "VaultIX",
-    description: "Secure Bookmark & Knowledge Management platform designed for efficient information storage and retrieval. Features real-time synchronization, advanced search filtering, integrated analytics, and automated notification systems.",
-    tech: ["Next.js", "React", "Supabase", "PostgreSQL"],
-    github: "https://github.com/sravankumar0103/VaultIX",
-    live: "https://vaultix-sk.vercel.app/"
-  },
-  {
-    title: "Hexapod Robotic Arm",
-    description: "Integrated a robotic arm into a 16-DOF hexapod robot for real-time object manipulation and automated task execution. Utilized AI, ML, and Computer Vision for adaptive autonomous behavior. Included an AR-based interface for real-time visualization.",
-    tech: ["Python", "OpenCV", "TensorFlow", "Raspberry Pi 5"],
-    github: "https://github.com/sravankumar0103",
-    live: "#"
-  },
-  {
-    title: "Python Utilities",
-    description: "Suite of Python utility applications focusing on logic and automation: Word Counter, Expense Tracker, and a Username Generator.",
-    tech: ["Python", "Automation Scripts"],
-    github: "https://github.com/sravankumar0103",
-    live: "#"
-  },
-  {
-    title: "Web App Suite",
-    description: "A collection of interactive web applications built during virtual internship, including a responsive landing page, Tic-Tac-Toe game, and a Stopwatch tool.",
-    tech: ["HTML5", "CSS3", "JavaScript"],
-    github: "https://github.com/sravankumar0103",
-    live: "#"
-  }
-];
+import { fallbackProjects, detailSlugByTitle } from '../../lib/projectsData';
 
 export function Projects() {
   const { data } = useSanityProjects();
@@ -74,6 +30,13 @@ function ProjectRow({ project, index }: { project: any, index: number }) {
   const num = (index + 1).toString().padStart(2, '0');
   const ref = useRef(null);
   const isInView = useInView(ref, { margin: "-30% 0px -30% 0px" });
+  // Resolve the detail-page link. Prefer explicit Sanity fields; otherwise fall
+  // back to matching the project title to a bundled write-up. An explicit
+  // hasDetailPage === false in Sanity always wins (opt-out).
+  const fallbackSlug = detailSlugByTitle[project.title];
+  const slug = project.slug || fallbackSlug;
+  const hasDetail = project.hasDetailPage === false ? false : (project.hasDetailPage === true || !!fallbackSlug);
+  const detailHref = hasDetail && slug ? `/projects/${slug}` : null;
 
   return (
     <motion.div
@@ -86,7 +49,7 @@ function ProjectRow({ project, index }: { project: any, index: number }) {
         transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1] }
       }}
       viewport={{ once: false, margin: "-30% 0px -30% 0px" }}
-      className="group relative border-b border-white/5 py-6 md:py-8 px-4 md:px-6 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden cursor-pointer"
+      className="group relative border-b border-white/5 py-6 md:py-8 px-4 md:px-6 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden"
     >
       {/* Cinematic Background Hover */}
       <div className="absolute inset-0 bg-white/[0.01] translate-y-full group-hover:translate-y-0 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]" />
@@ -101,13 +64,25 @@ function ProjectRow({ project, index }: { project: any, index: number }) {
         <div className="flex-1">
           <div className="flex flex-col gap-3">
             <h3 className="text-2xl sm:text-3xl md:text-5xl font-display font-medium transition-all duration-500 group-hover:tracking-tight">
-              <ScrollRevealText 
-                text={project.title}
-                isActive={isInView}
-                from="rgba(255, 255, 255, 0.1)"
-                to="hsl(11, 81%, 57%)"
-                characterClassName="group-hover:!text-foreground"
-              />
+              {detailHref ? (
+                <Link href={detailHref} className="cursor-pointer">
+                  <ScrollRevealText
+                    text={project.title}
+                    isActive={isInView}
+                    from="rgba(255, 255, 255, 0.1)"
+                    to="hsl(11, 81%, 57%)"
+                    characterClassName="group-hover:!text-foreground"
+                  />
+                </Link>
+              ) : (
+                <ScrollRevealText
+                  text={project.title}
+                  isActive={isInView}
+                  from="rgba(255, 255, 255, 0.1)"
+                  to="hsl(11, 81%, 57%)"
+                  characterClassName="group-hover:!text-foreground"
+                />
+              )}
             </h3>
 
             <div className="flex flex-wrap gap-2">
@@ -169,9 +144,19 @@ function ProjectRow({ project, index }: { project: any, index: number }) {
               </a>
             )}
           </motion.div>
-          <div className="hidden md:flex w-10 h-10 rounded-full border border-white/10 items-center justify-center text-muted-foreground group-hover:bg-primary group-hover:text-background group-hover:border-primary transition-all duration-500">
-            <ArrowRight className="w-4 h-4 -rotate-45 group-hover:rotate-0 transition-transform duration-500" />
-          </div>
+          {detailHref ? (
+            <Link
+              href={detailHref}
+              aria-label={`Read more about ${project.title}`}
+              className="flex w-10 h-10 rounded-full border border-white/10 items-center justify-center text-muted-foreground group-hover:bg-primary group-hover:text-background group-hover:border-primary transition-all duration-500 cursor-pointer"
+            >
+              <ArrowRight className="w-4 h-4 -rotate-45 group-hover:rotate-0 transition-transform duration-500" />
+            </Link>
+          ) : (
+            <div className="hidden md:flex w-10 h-10 rounded-full border border-white/10 items-center justify-center text-muted-foreground group-hover:bg-primary group-hover:text-background group-hover:border-primary transition-all duration-500">
+              <ArrowRight className="w-4 h-4 -rotate-45 group-hover:rotate-0 transition-transform duration-500" />
+            </div>
+          )}
         </div>
       </div>
     </motion.div>

@@ -17,8 +17,17 @@ const API_VERSION = '2024-01-01';
 // Traffic for a personal portfolio is well within the live endpoint's limits.
 const BASE_URL = `https://${PROJECT_ID}.api.sanity.io/v${API_VERSION}/data/query/${DATASET}`;
 
-export async function sanityFetch<T>(query: string): Promise<T> {
-  const url = `${BASE_URL}?query=${encodeURIComponent(query)}`;
+export async function sanityFetch<T>(
+  query: string,
+  params?: Record<string, string | number | boolean>,
+): Promise<T> {
+  // GROQ params are passed as $param=<json-encoded value> query-string entries.
+  const paramString = params
+    ? Object.entries(params)
+        .map(([k, v]) => `&$${k}=${encodeURIComponent(JSON.stringify(v))}`)
+        .join('')
+    : '';
+  const url = `${BASE_URL}?query=${encodeURIComponent(query)}${paramString}`;
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error(`Sanity request failed: ${res.status}`);
