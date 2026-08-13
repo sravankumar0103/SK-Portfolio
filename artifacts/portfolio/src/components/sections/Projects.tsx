@@ -30,13 +30,14 @@ function ProjectRow({ project, index }: { project: any, index: number }) {
   const num = (index + 1).toString().padStart(2, '0');
   const ref = useRef(null);
   const isInView = useInView(ref, { margin: "-30% 0px -30% 0px" });
-  // Resolve the detail-page link. Prefer explicit Sanity fields; otherwise fall
-  // back to matching the project title to a bundled write-up. An explicit
-  // hasDetailPage === false in Sanity always wins (opt-out).
+  // Resolve the detail-page link. Every project that has a slug — either from
+  // Sanity or matched by title to a bundled write-up — gets a working page.
+  // The Sanity "Enable detail page" toggle only decides whether the page shows
+  // custom CMS content or falls back to the bundled starter content; it never
+  // removes the page itself.
   const fallbackSlug = detailSlugByTitle[project.title];
   const slug = project.slug || fallbackSlug;
-  const hasDetail = project.hasDetailPage === false ? false : (project.hasDetailPage === true || !!fallbackSlug);
-  const detailHref = hasDetail && slug ? `/projects/${slug}` : null;
+  const detailHref = slug ? `/projects/${slug}` : null;
 
   return (
     <motion.div
