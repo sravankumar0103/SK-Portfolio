@@ -20,6 +20,10 @@ export function SmoothScroll({ children }: SmoothScrollProps) {
       infinite: false,
     });
 
+    // Expose the instance so other components (e.g. returning from a project
+    // page) can scroll to a section reliably instead of fighting Lenis.
+    (window as any).__lenis = lenis;
+
     // RAF loop for Lenis
     function raf(time: number) {
       lenis.raf(time);
@@ -31,6 +35,7 @@ export function SmoothScroll({ children }: SmoothScrollProps) {
     // Clean up
     return () => {
       lenis.destroy();
+      (window as any).__lenis = null;
     };
   }, []);
 

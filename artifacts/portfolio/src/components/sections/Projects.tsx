@@ -7,6 +7,10 @@ import { ArrowRight, Github, ExternalLink } from 'lucide-react';
 import { useSanityProjects } from '../../lib/sanityQueries';
 import { fallbackProjects, detailSlugByTitle } from '../../lib/projectsData';
 
+// Projects whose "Code" link is only a GitHub profile (no single repo) — hide
+// the Code button for these.
+const NO_CODE_SLUGS = new Set(['hexapod-robotic-arm']);
+
 export function Projects() {
   const { data } = useSanityProjects();
   const projects = data && data.length ? data : fallbackProjects;
@@ -42,6 +46,7 @@ function ProjectRow({ project, index }: { project: any, index: number }) {
   return (
     <motion.div
       ref={ref}
+      id={slug ? `project-${slug}` : undefined}
       initial={{ opacity: 1, y: 0, scale: 0.95 }}
       whileInView={{
         opacity: 1,
@@ -120,7 +125,7 @@ function ProjectRow({ project, index }: { project: any, index: number }) {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="flex items-center gap-3"
           >
-            {project.github && (
+            {project.github && !NO_CODE_SLUGS.has(slug ?? '') && (
               <a
                 href={project.github}
                 target="_blank"

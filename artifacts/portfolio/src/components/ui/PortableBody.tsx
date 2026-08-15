@@ -6,17 +6,18 @@ import { imageUrl } from '../../lib/sanity';
 const components: PortableTextComponents = {
   block: {
     normal: ({ children }) => (
-      <p className="text-[15px] md:text-base font-sans text-muted-foreground leading-[1.9] my-5">
+      <p className="text-sm md:text-base font-sans text-muted-foreground leading-[1.85] my-5">
         {children}
       </p>
     ),
     h2: ({ children }) => (
-      <h2 className="text-2xl md:text-3xl font-display font-medium text-foreground mt-14 mb-4">
+      <h2 className="group text-xl md:text-3xl font-display font-semibold text-foreground mt-14 mb-4 flex items-center gap-3">
+        <span className="w-6 h-px bg-primary/60 shrink-0" />
         {children}
       </h2>
     ),
     h3: ({ children }) => (
-      <h3 className="text-xl md:text-2xl font-display font-medium text-foreground mt-10 mb-3">
+      <h3 className="text-lg md:text-xl font-display font-semibold text-foreground mt-10 mb-3">
         {children}
       </h3>
     ),
@@ -28,22 +29,25 @@ const components: PortableTextComponents = {
   },
   list: {
     bullet: ({ children }) => (
-      <ul className="list-disc pl-5 my-5 space-y-2 text-muted-foreground marker:text-primary">
-        {children}
-      </ul>
+      <ul className="my-6 space-y-3">{children}</ul>
     ),
     number: ({ children }) => (
-      <ol className="list-decimal pl-5 my-5 space-y-2 text-muted-foreground marker:text-primary">
+      <ol className="my-6 space-y-3 list-decimal pl-5 marker:text-primary marker:font-semibold">
         {children}
       </ol>
     ),
   },
   listItem: {
     bullet: ({ children }) => (
-      <li className="text-[15px] md:text-base font-sans leading-relaxed">{children}</li>
+      <li className="flex items-start gap-3 text-sm md:text-base font-sans text-muted-foreground leading-relaxed">
+        <span className="mt-2 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+        <span>{children}</span>
+      </li>
     ),
     number: ({ children }) => (
-      <li className="text-[15px] md:text-base font-sans leading-relaxed">{children}</li>
+      <li className="text-sm md:text-base font-sans text-muted-foreground leading-relaxed pl-1">
+        {children}
+      </li>
     ),
   },
   marks: {
