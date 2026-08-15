@@ -124,6 +124,15 @@ export default defineType({
       hidden: ({ parent }) => !parent?.hasDetailPage,
     }),
     defineField({
+      name: 'clientLabel',
+      title: 'Client heading',
+      description:
+        'Overrides the "Client" heading above the value on the left — e.g. "Project", "Institution". Leave empty to show "Client".',
+      type: 'string',
+      group: 'detail',
+      hidden: ({ parent }) => !parent?.hasDetailPage,
+    }),
+    defineField({
       name: 'role',
       title: 'Role',
       description: 'e.g. "Full-Stack Developer". Optional.',

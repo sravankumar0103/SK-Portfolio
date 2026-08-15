@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Link, useParams } from 'wouter';
 import { motion, useScroll, useSpring } from 'framer-motion';
-import { ArrowLeft, Github, ExternalLink, ArrowUpRight, Sparkles } from 'lucide-react';
+import { Github, ExternalLink, ArrowUpRight, Sparkles } from 'lucide-react';
 import { useSanityProject, type SanityProjectDetail } from '../lib/sanityQueries';
 import { fallbackProjectDetails } from '../lib/projectsData';
 import { imageUrl } from '../lib/sanity';
@@ -30,6 +30,7 @@ function resolveDetail(
     github: sanity.github || fallback.github,
     live: sanity.live || fallback.live,
     client: sanity.client || fallback.client,
+    clientLabel: sanity.clientLabel || fallback.clientLabel,
     role: sanity.role || fallback.role,
     timeline: sanity.timeline || fallback.timeline,
   };
@@ -83,6 +84,8 @@ export default function ProjectDetail() {
 
   const cover = imageUrl(project.coverImageUrl, 2000);
   const hasLive = project.live && project.live !== '#';
+  const showGithub = Boolean(project.github) && slug !== 'hexapod-robotic-arm';
+  const showActions = showGithub || hasLive;
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-primary/30 selection:text-primary">
@@ -92,23 +95,9 @@ export default function ProjectDetail() {
         style={{ scaleX: progress }}
       />
 
-      {/* Slim header */}
-      <header className="fixed top-0 left-0 w-full z-50 px-6 md:px-12 py-4 flex items-center justify-between bg-gradient-to-b from-background/95 via-background/70 to-transparent backdrop-blur-sm">
-        <Link
-          href={backHref}
-          className="group flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          <span className="font-sans">Back to Portfolio</span>
-        </Link>
-        <Link href="/" className="text-sm font-display font-semibold hover:text-primary transition-colors">
-          Sravan Kumar
-        </Link>
-      </header>
-
       {/* ---------- HERO (full-bleed, solid background) ---------- */}
       <section className="relative overflow-hidden">
-        <div className="relative container mx-auto max-w-7xl px-6 md:px-12 pt-24 md:pt-28 pb-6 md:pb-8">
+        <div className="relative container mx-auto max-w-7xl px-6 md:px-12 pt-16 md:pt-20 pb-6 md:pb-8">
           <div className="max-w-4xl">
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
@@ -130,33 +119,35 @@ export default function ProjectDetail() {
               </motion.p>
             )}
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: EASE, delay: 0.25 }}
-              className="mt-10 flex flex-wrap items-center gap-3"
-            >
-              {project.github && slug !== 'hexapod-robotic-arm' && (
-                <a
-                  href={project.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-foreground rounded-full border border-white/10 hover:border-primary/40 hover:bg-white/[0.04] transition-all hover-lift"
-                >
-                  <Github className="w-4 h-4" /> View Code
-                </a>
-              )}
-              {hasLive && (
-                <a
-                  href={project.live}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-background bg-primary hover:bg-primary/90 rounded-full transition-all glow-hover hover-lift"
-                >
-                  <ExternalLink className="w-4 h-4" /> Live Demo
-                </a>
-              )}
-            </motion.div>
+            {showActions && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: EASE, delay: 0.25 }}
+                className="mt-10 flex flex-wrap items-center gap-3"
+              >
+                {showGithub && (
+                  <a
+                    href={project.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-foreground rounded-full border border-white/10 hover:border-primary/40 hover:bg-white/[0.04] transition-all hover-lift"
+                  >
+                    <Github className="w-4 h-4" /> View Code
+                  </a>
+                )}
+                {hasLive && (
+                  <a
+                    href={project.live}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-background bg-primary hover:bg-primary/90 rounded-full transition-all glow-hover hover-lift"
+                  >
+                    <ExternalLink className="w-4 h-4" /> Live Demo
+                  </a>
+                )}
+              </motion.div>
+            )}
           </div>
         </div>
       </section>
@@ -180,14 +171,19 @@ export default function ProjectDetail() {
         </section>
       )}
 
-      {/* ---------- BODY (two columns to fill width) ---------- */}
-      <section className="container mx-auto max-w-7xl px-6 md:px-12 pt-12 md:pt-16 pb-16 md:pb-20">
-        <div className="grid lg:grid-cols-[280px_1fr] gap-12 lg:gap-24">
-          {/* Sticky spec sidebar */}
-          <aside className="lg:sticky lg:top-28 h-max space-y-8">
+      {/* ---------- BODY (sidebar + full-width content column) ---------- */}
+      <section
+        className={`container mx-auto max-w-7xl px-6 md:px-12 pb-16 md:pb-20 ${
+          cover ? 'pt-12 md:pt-16' : 'pt-8 md:pt-10'
+        }`}
+      >
+        <div className="grid lg:grid-cols-[240px_1fr] gap-10 lg:gap-16 xl:gap-20">
+          {/* Sticky spec sidebar — thin orange rule on its right edge, only as
+              tall as the sidebar content (h-max stops it stretching full height) */}
+          <aside className="lg:sticky lg:top-24 h-max space-y-8 lg:pr-8 lg:relative lg:after:content-[''] lg:after:absolute lg:after:right-0 lg:after:top-6 lg:after:bottom-6 lg:after:w-[3px] lg:after:bg-primary/40">
             <MetaRow label="Role" value={project.role} />
             <MetaRow label="Timeline" value={project.timeline} />
-            <MetaRow label="Client" value={project.client} />
+            <MetaRow label={project.clientLabel || 'Client'} value={project.client} />
 
             {project.tech && project.tech.length > 0 && (
               <div className="pt-6 border-t border-white/5">
@@ -208,7 +204,7 @@ export default function ProjectDetail() {
             )}
           </aside>
 
-          {/* Main content */}
+          {/* Main content — one consistent left edge, fills the full column width */}
           <div className="min-w-0">
             {project.body && project.body.length > 0 && (
               <motion.div
@@ -216,7 +212,7 @@ export default function ProjectDetail() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-10% 0px' }}
                 transition={{ duration: 0.7, ease: EASE }}
-                className="max-w-3xl"
+                className="[&>*:first-child]:!mt-0"
               >
                 <PortableBody value={project.body} />
               </motion.div>

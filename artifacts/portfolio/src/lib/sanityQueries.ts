@@ -49,6 +49,7 @@ export interface SanityProjectDetail {
   slug?: string;
   overview?: string;
   client?: string;
+  clientLabel?: string; // Overrides the "Client" heading (e.g. "Institution") per project.
   role?: string;
   timeline?: string;
   coverImageUrl?: string;
@@ -60,7 +61,7 @@ export interface SanityProjectDetail {
 
 const projectDetailQuery = `*[_type == "project" && slug.current == $slug && hasDetailPage == true][0]{
   title, description, tech, github, live, "slug": slug.current,
-  overview, client, role, timeline,
+  overview, client, clientLabel, role, timeline,
   "coverImageUrl": coverImage.asset->url,
   body[]{
     ...,
