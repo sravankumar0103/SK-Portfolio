@@ -89,7 +89,9 @@ export function Contact() {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({
-          access_key: "5efdf489-27ba-41bd-baec-f7e6bebc647a",
+          // Web3Forms keys are designed to be client-visible, but should still be
+          // domain-restricted in the Web3Forms dashboard (manual step, do after moving domains).
+          access_key: import.meta.env.VITE_WEB3FORMS_KEY,
           name: data.name,
           email: data.email,
           message: data.message,
@@ -271,33 +273,19 @@ export function Contact() {
 
           <motion.button
             onClick={() => {
-              // Cancel any existing navbar scroll loops
-              if ((window as any)._cancelScroll) (window as any)._cancelScroll();
-              
-              let isScrolling = true;
-              const interrupt = () => { isScrolling = false; };
-              window.addEventListener('wheel', interrupt, { passive: true, once: true });
-              window.addEventListener('touchstart', interrupt, { passive: true, once: true });
-              
-              const smoothScrollTop = () => {
-                if (!isScrolling) return;
-                
-                const currentY = window.scrollY;
-                if (currentY <= 2) {
-                  window.scrollTo(0, 0);
-                  window.removeEventListener('wheel', interrupt);
-                  window.removeEventListener('touchstart', interrupt);
-                  return;
-                }
-                
-                // Move 15% of the distance to top per frame
-                const move = Math.max(currentY * 0.15, 1);
-                window.scrollBy(0, -move);
-                
-                requestAnimationFrame(smoothScrollTop);
-              };
-              
-              requestAnimationFrame(smoothScrollTop);
+              // Delegate to Lenis's own RAF loop (already running in
+              // SmoothScroll.tsx) instead of a separate hand-rolled one.
+              // Calling scrollTo again also naturally supersedes any
+              // in-flight Navbar scroll-to-section animation.
+              const lenis = (window as any).__lenis;
+              if (lenis) {
+                lenis.scrollTo(0, {
+                  duration: 1.2,
+                  easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                });
+              } else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
             }}
             className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-primary hover:text-background hover:bg-primary hover:border-primary transition-all duration-500 group shadow-lg"
             whileHover={{ y: -5, scale: 1.1 }}

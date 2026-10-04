@@ -60,52 +60,20 @@ export function Navbar() {
     const target = document.getElementById(targetId);
     if (!target) return;
 
-    // Cancel any existing scroll loop
-    if ((window as any)._scrollFrame) {
-      cancelAnimationFrame((window as any)._scrollFrame);
-    }
-    
-    // Remove old interrupt listeners if they exist
-    if ((window as any)._cancelScroll) {
-      (window as any)._cancelScroll();
-    }
-
-    let isScrolling = true;
-
-    // Listen for actual user interactions to interrupt the smooth scroll
-    const interrupt = () => { isScrolling = false; };
-    window.addEventListener('wheel', interrupt, { passive: true, once: true });
-    window.addEventListener('touchstart', interrupt, { passive: true, once: true });
-    
-    (window as any)._cancelScroll = () => {
-      isScrolling = false;
-      window.removeEventListener('wheel', interrupt);
-      window.removeEventListener('touchstart', interrupt);
-    };
-
-    const smoothScroll = () => {
-      if (!isScrolling) return;
-
+    // Delegate the scroll-to-target animation to Lenis's own RAF loop
+    // (already running in SmoothScroll.tsx) instead of a second, competing
+    // RAF loop here. Lenis auto-interrupts on real user wheel/touch input.
+    const lenis = (window as any).__lenis;
+    if (lenis) {
+      lenis.scrollTo(target, {
+        offset: -SCROLL_MARGIN_TOP,
+        duration: 1.2,
+        easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      });
+    } else {
       const rect = target.getBoundingClientRect();
-      const targetY = rect.top - SCROLL_MARGIN_TOP;
-      
-      // Stop condition: very close to target OR hit the absolute bottom of the page
-      if (Math.abs(targetY) < 2 || (window.innerHeight + window.scrollY >= document.body.offsetHeight - 2 && targetY > 0)) {
-        window.scrollBy(0, targetY);
-        (window as any)._cancelScroll();
-        return;
-      }
-      
-      // Adaptive step: move 12% of the remaining distance per frame.
-      const step = targetY * 0.12;
-      const move = targetY > 0 ? Math.max(step, 1) : Math.min(step, -1);
-      
-      window.scrollBy(0, move);
-      
-      (window as any)._scrollFrame = requestAnimationFrame(smoothScroll);
-    };
-
-    (window as any)._scrollFrame = requestAnimationFrame(smoothScroll);
+      window.scrollBy({ top: rect.top - SCROLL_MARGIN_TOP, behavior: 'smooth' });
+    }
   };
 
   return (

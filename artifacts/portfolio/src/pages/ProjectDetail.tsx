@@ -66,7 +66,31 @@ export default function ProjectDetail() {
   }, [slug]);
 
   useEffect(() => {
-    if (project) document.title = `${project.title} — Sravan Kumar`;
+    if (!project) return;
+
+    document.title = `${project.title} — Sravan Kumar`;
+
+    // Same-session share/unfurl improvement only — crawlers that don't run JS
+    // (most social-media scrapers) still see the static tags in index.html.
+    const pageTitle = `${project.title} — Sravan Kumar`;
+    const pageDescription = project.description || project.overview || '';
+    const pageImage = project.coverImageUrl ? imageUrl(project.coverImageUrl, 1200) : undefined;
+
+    const setMeta = (selector: string, content?: string) => {
+      if (!content) return;
+      const el = document.querySelector(selector);
+      if (el) el.setAttribute('content', content);
+    };
+
+    setMeta('meta[property="og:title"]', pageTitle);
+    setMeta('meta[property="og:description"]', pageDescription);
+    setMeta('meta[property="og:url"]', window.location.href);
+    if (pageImage) setMeta('meta[property="og:image"]', pageImage);
+
+    setMeta('meta[name="twitter:title"]', pageTitle);
+    setMeta('meta[name="twitter:description"]', pageDescription);
+    if (pageImage) setMeta('meta[name="twitter:image"]', pageImage);
+
     return () => {
       document.title = 'Sravan Kumar Portfolio';
     };
