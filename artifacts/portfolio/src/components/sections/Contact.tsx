@@ -199,6 +199,9 @@ export function Contact() {
                     <label htmlFor="name" className="absolute left-0 top-1 text-muted-foreground transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:top-1 peer-focus:-top-5 peer-focus:text-[9px] peer-focus:text-primary peer-focus:tracking-[0.2em] peer-focus:uppercase uppercase text-[9px] tracking-[0.2em] -top-5 pointer-events-none opacity-60">
                       Name
                     </label>
+                    {errors.name && (
+                      <p className="mt-1 text-[10px] text-red-400 font-sans">{errors.name.message}</p>
+                    )}
                   </div>
 
                   <div className="relative group">
@@ -212,6 +215,9 @@ export function Contact() {
                     <label htmlFor="email" className="absolute left-0 top-1 text-muted-foreground transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:top-1 peer-focus:-top-5 peer-focus:text-[9px] peer-focus:text-primary peer-focus:tracking-[0.2em] peer-focus:uppercase uppercase text-[9px] tracking-[0.2em] -top-5 pointer-events-none opacity-60">
                       Email
                     </label>
+                    {errors.email && (
+                      <p className="mt-1 text-[10px] text-red-400 font-sans">{errors.email.message}</p>
+                    )}
                   </div>
                 </div>
 
@@ -225,6 +231,9 @@ export function Contact() {
                   <label htmlFor="message" className="absolute left-0 top-1 text-muted-foreground transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:top-1 peer-focus:-top-5 peer-focus:text-[9px] peer-focus:text-primary peer-focus:tracking-[0.2em] peer-focus:uppercase uppercase text-[9px] tracking-[0.2em] -top-5 pointer-events-none opacity-60">
                     Message
                   </label>
+                  {errors.message && (
+                    <p className="mt-1 text-[10px] text-red-400 font-sans">{errors.message.message}</p>
+                  )}
                 </div>
 
                 <div className="flex justify-end pt-2">

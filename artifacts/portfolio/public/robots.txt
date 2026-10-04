@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://sravankumardiddi.vercel.app/sitemap.xml
+Sitemap: https://sravankumar.online/sitemap.xml

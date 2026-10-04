@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://sravankumardiddi.vercel.app/</loc>
+    <loc>https://sravankumar.online/</loc>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://sravankumardiddi.vercel.app/projects/arogyalens</loc>
+    <loc>https://sravankumar.online/projects/arogyalens</loc>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://sravankumardiddi.vercel.app/projects/crm-nuzividu</loc>
+    <loc>https://sravankumar.online/projects/crm-nuzividu</loc>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://sravankumardiddi.vercel.app/projects/vaultix</loc>
+    <loc>https://sravankumar.online/projects/vaultix</loc>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://sravankumardiddi.vercel.app/projects/hexapod-robotic-arm</loc>
+    <loc>https://sravankumar.online/projects/hexapod-robotic-arm</loc>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://sravankumardiddi.vercel.app/projects/python-utilities</loc>
+    <loc>https://sravankumar.online/projects/python-utilities</loc>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://sravankumardiddi.vercel.app/projects/web-app-suite</loc>
+    <loc>https://sravankumar.online/projects/web-app-suite</loc>
     <priority>0.8</priority>
   </url>
 </urlset>
