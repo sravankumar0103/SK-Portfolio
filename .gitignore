@@ -43,3 +43,11 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+
+# Local Claude Code tooling — per-machine, never committed (reinstall steps in CLAUDE.md)
+.claude/settings.local.json
+.claude/skills/impeccable/
+.claude/agents/impeccable-*.md
+.impeccable/
+# Watermelon UI MCP is added at local scope (~/.claude.json); this guards a project-scope add
+.mcp.json
