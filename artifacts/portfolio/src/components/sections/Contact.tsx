@@ -6,15 +6,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useToast } from "@/hooks/use-toast";
 import { ScrollRevealText } from '../ui/ScrollRevealText';
-import { useSanitySiteSettings } from '../../lib/sanityQueries';
+import { useSanitySiteSettings, orFallback } from '../../lib/sanityQueries';
+import { FALLBACK_EMAIL, fallbackSocials } from '../../lib/fallbackContent';
 import { scrollToY } from '../../lib/lenis';
-
-// Fallback content — used if Sanity is empty, loading, or unreachable.
-const FALLBACK_EMAIL = 'sravankumar0103@gmail.com';
-const fallbackSocials = [
-  { platform: 'github', url: 'https://github.com/sravankumar0103' },
-  { platform: 'linkedin', url: 'https://linkedin.com/in/diddi-sravan-kumar' },
-];
 
 function iconForPlatform(platform?: string): React.ReactNode {
   switch (platform) {
@@ -43,7 +37,7 @@ export function Contact() {
   const { toast } = useToast();
   const { data: settings } = useSanitySiteSettings();
   const email = settings?.contactEmail || FALLBACK_EMAIL;
-  const socials = settings?.socials && settings.socials.length ? settings.socials : fallbackSocials;
+  const socials = orFallback(settings?.socials, fallbackSocials);
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<ContactFormValues>({
     resolver: zodResolver(contactSchema),

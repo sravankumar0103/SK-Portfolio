@@ -1,13 +1,47 @@
 // ---------------------------------------------------------------------------
 // GROQ queries + typed React Query hooks for each portfolio section.
-// Every hook is read-only. Components use `data ?? fallback`, so an empty or
-// unreachable Sanity leaves the site visually identical to the hardcoded version.
+// Every hook is read-only. The four list hooks apply their own fallback and
+// return `T[]` (never `undefined`), so an empty, loading or unreachable Sanity
+// leaves the site visually identical to the hardcoded version and a component
+// cannot forget one. Fallbacks live in fallbackContent.ts and projectsData.ts.
 // ---------------------------------------------------------------------------
 import { useQuery } from '@tanstack/react-query';
 import type { PortableTextBlock } from '@portabletext/react';
 import { sanityFetch } from './sanity';
+import { fallbackProjects } from './projectsData';
+import {
+  fallbackCertifications,
+  fallbackExperience,
+  fallbackSkills,
+} from './fallbackContent';
 
 const STALE_TIME = 1000 * 60; // 1 min — content is not time-critical
+
+// `primary` when it has at least one item, else `fallback`. The one place the
+// "empty means fall back" rule is written; sections and resolveDetail import it.
+export function orFallback<T>(primary: T[] | null | undefined, fallback: T[]): T[];
+export function orFallback<T>(
+  primary: T[] | null | undefined,
+  fallback: T[] | undefined,
+): T[] | undefined;
+export function orFallback<T>(
+  primary: T[] | null | undefined,
+  fallback: T[] | undefined,
+): T[] | undefined {
+  return primary && primary.length ? primary : fallback;
+}
+
+// A list query that resolves to its fallback while loading, on error, and when
+// Sanity returns an empty list.
+function useSanityList<T>(key: string, query: string, fallback: T[]): T[] {
+  const { data } = useQuery({
+    queryKey: ['sanity', key],
+    queryFn: () => sanityFetch<T[]>(query),
+    staleTime: STALE_TIME,
+    retry: 1,
+  });
+  return orFallback(data, fallback);
+}
 
 // ---------- Projects ----------
 export interface SanityProject {
@@ -26,13 +60,8 @@ const projectsQuery = `*[_type == "project" && visible != false]|order(order asc
   hasDetailPage, "slug": slug.current
 }`;
 
-export function useSanityProjects() {
-  return useQuery({
-    queryKey: ['sanity', 'projects'],
-    queryFn: () => sanityFetch<SanityProject[]>(projectsQuery),
-    staleTime: STALE_TIME,
-    retry: 1,
-  });
+export function useSanityProjects(): SanityProject[] {
+  return useSanityList('projects', projectsQuery, fallbackProjects);
 }
 
 // ---------- Single project (detail / blog page) ----------
@@ -102,13 +131,8 @@ const experienceQuery = `*[_type == "experience"]|order(order asc, _createdAt as
   role, company, date, description
 }`;
 
-export function useSanityExperience() {
-  return useQuery({
-    queryKey: ['sanity', 'experience'],
-    queryFn: () => sanityFetch<SanityExperience[]>(experienceQuery),
-    staleTime: STALE_TIME,
-    retry: 1,
-  });
+export function useSanityExperience(): SanityExperience[] {
+  return useSanityList('experience', experienceQuery, fallbackExperience);
 }
 
 // ---------- Skills ----------
@@ -121,13 +145,8 @@ const skillsQuery = `*[_type == "skillGroup"]|order(order asc, _createdAt asc){
   category, items
 }`;
 
-export function useSanitySkills() {
-  return useQuery({
-    queryKey: ['sanity', 'skills'],
-    queryFn: () => sanityFetch<SanitySkillGroup[]>(skillsQuery),
-    staleTime: STALE_TIME,
-    retry: 1,
-  });
+export function useSanitySkills(): SanitySkillGroup[] {
+  return useSanityList('skills', skillsQuery, fallbackSkills);
 }
 
 // ---------- Certifications ----------
@@ -142,13 +161,8 @@ const certsQuery = `*[_type == "certification"]|order(order asc, _createdAt asc)
   name, issuer, date, link
 }`;
 
-export function useSanityCertifications() {
-  return useQuery({
-    queryKey: ['sanity', 'certifications'],
-    queryFn: () => sanityFetch<SanityCertification[]>(certsQuery),
-    staleTime: STALE_TIME,
-    retry: 1,
-  });
+export function useSanityCertifications(): SanityCertification[] {
+  return useSanityList('certifications', certsQuery, fallbackCertifications);
 }
 
 // ---------- Site Settings (Hero / About / Resume / Contact) ----------

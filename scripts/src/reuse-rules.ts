@@ -63,4 +63,11 @@ export const RULES: ReuseRule[] = [
     pattern: /:\s*any\b|\bas any\b|\bany\[\]/,
     message: 'Use the real type: the Sanity interfaces in sanityQueries.ts, Portable Text types, or MotionValue.',
   },
+  {
+    id: 'fallback-in-hooks',
+    audit: 'C2',
+    pattern: /\.length\s*\?\s*[\w.?]+\s*:/,
+    allowIn: ['src/lib/sanityQueries.ts'],
+    message: 'Fallbacks are applied by the hooks and by orFallback in src/lib/sanityQueries.ts; do not write `x.length ? x : fallback` in a component.',
+  },
 ];

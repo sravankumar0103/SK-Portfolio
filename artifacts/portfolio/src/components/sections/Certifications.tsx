@@ -3,29 +3,8 @@ import { ExternalLink } from 'lucide-react';
 import { SectionHeading } from '../ui/SectionHeading';
 import { useSanityCertifications } from '../../lib/sanityQueries';
 
-// Fallback content — used if Sanity is empty, loading, or unreachable.
-const fallbackCerts = [
-  {
-    name: "Google Cybersecurity",
-    issuer: "Google / Coursera",
-    date: "2024",
-    link: "https://www.coursera.org/account/accomplishments/professional-cert/HZXL29HPYAK2"
-  },
-  {
-    name: "Machine Learning & Artificial Intelligence",
-    issuer: "IBM",
-    date: "2023"
-  },
-  {
-    name: "Machine Learning, Data Engineering, Cloud Architecting",
-    issuer: "AWS Academy",
-    date: "2023"
-  }
-];
-
 export function Certifications() {
-  const { data } = useSanityCertifications();
-  const certs = data && data.length ? data : fallbackCerts;
+  const certs = useSanityCertifications();
 
   return (
     <section id="certifications" className="py-12 md:py-20 relative">

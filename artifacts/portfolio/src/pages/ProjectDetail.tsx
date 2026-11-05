@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Link, useParams } from 'wouter';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import { Github, ExternalLink, ArrowUpRight, Sparkles } from 'lucide-react';
-import { useSanityProject, type SanityProjectDetail } from '../lib/sanityQueries';
+import { useSanityProject, orFallback, type SanityProjectDetail } from '../lib/sanityQueries';
 import { fallbackProjectDetails } from '../lib/projectsData';
 import { imageUrl } from '../lib/sanity';
 import { reassert, scrollToY } from '../lib/lenis';
@@ -26,8 +26,9 @@ function resolveDetail(
     ...fallback,
     title: sanity.title || fallback.title,
     coverImageUrl: sanity.coverImageUrl || fallback.coverImageUrl,
-    gallery: sanity.gallery && sanity.gallery.length ? sanity.gallery : fallback.gallery,
-    tech: fallback.tech && fallback.tech.length ? fallback.tech : sanity.tech,
+    gallery: orFallback(sanity.gallery, fallback.gallery),
+    // Reversed on purpose: the bundled write-up's tech list wins over the CMS's.
+    tech: orFallback(fallback.tech, sanity.tech),
     github: sanity.github || fallback.github,
     live: sanity.live || fallback.live,
     client: sanity.client || fallback.client,

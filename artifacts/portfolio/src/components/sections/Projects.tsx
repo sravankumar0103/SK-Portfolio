@@ -5,15 +5,14 @@ import { SectionHeading } from '../ui/SectionHeading';
 import { ScrollRevealText } from '../ui/ScrollRevealText';
 import { ArrowRight, Github, ExternalLink } from 'lucide-react';
 import { useSanityProjects, type SanityProject } from '../../lib/sanityQueries';
-import { fallbackProjects, detailSlugByTitle } from '../../lib/projectsData';
+import { detailSlugByTitle } from '../../lib/projectsData';
 
 // Projects whose "Code" link is only a GitHub profile (no single repo) — hide
 // the Code button for these.
 const NO_CODE_SLUGS = new Set(['hexapod-robotic-arm']);
 
 export function Projects() {
-  const { data } = useSanityProjects();
-  const projects = data && data.length ? data : fallbackProjects;
+  const projects = useSanityProjects();
 
   return (
     <section id="projects" className="py-12 md:py-20 relative">

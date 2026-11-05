@@ -3,25 +3,8 @@ import { SectionHeading } from '../ui/SectionHeading';
 import { ScrollRevealText } from '../ui/ScrollRevealText';
 import { useSanitySkills } from '../../lib/sanityQueries';
 
-// Fallback content — used if Sanity is empty, loading, or unreachable.
-const fallbackSkills = [
-  {
-    category: "Languages",
-    items: ["Python", "Java", "SQL", "JavaScript", "HTML5", "CSS3"]
-  },
-  {
-    category: "Frameworks & Libraries",
-    items: ["Next.js", "React", "TensorFlow", "OpenCV", "Bootstrap", "Tailwind CSS"]
-  },
-  {
-    category: "Tools & Infrastructure",
-    items: ["Git", "Supabase", "PostgreSQL", "Tableau", "Raspberry Pi", "Vercel"]
-  }
-];
-
 export function Skills() {
-  const { data } = useSanitySkills();
-  const skills = data && data.length ? data : fallbackSkills;
+  const skills = useSanitySkills();
 
   return (
     <section id="skills" className="py-12 md:py-20 relative">

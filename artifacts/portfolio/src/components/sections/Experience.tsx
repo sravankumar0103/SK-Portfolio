@@ -4,25 +4,8 @@ import { SectionHeading } from '../ui/SectionHeading';
 import { ScrollRevealText } from '../ui/ScrollRevealText';
 import { useSanityExperience, type SanityExperience } from '../../lib/sanityQueries';
 
-// Fallback content — used if Sanity is empty, loading, or unreachable.
-const fallbackExperiences = [
-  {
-    role: "Python Programming Intern",
-    company: "MotionCut",
-    date: "Jan 2025 – Feb 2025",
-    description: "Automated real-world tasks with Python resulting in a 30% effort reduction. Solved 10+ problem statements."
-  },
-  {
-    role: "Web Development Intern",
-    company: "Prodigy InfoTech",
-    date: "Jun 2024 – Jul 2024",
-    description: "Built 3+ responsive web apps with HTML/CSS/JS. Collaborated effectively within a 5+ member team."
-  }
-];
-
 export function Experience() {
-  const { data } = useSanityExperience();
-  const experiences = data && data.length ? data : fallbackExperiences;
+  const experiences = useSanityExperience();
 
   return (
     <section id="experience" className="py-12 md:py-20 relative">
