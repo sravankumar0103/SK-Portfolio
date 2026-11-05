@@ -1,5 +1,6 @@
 import { PortableText, type PortableTextComponents } from '@portabletext/react';
 import { imageUrl } from '../../lib/sanity';
+import type { SanityProjectDetail } from '../../lib/sanityQueries';
 
 // Renders Sanity Portable Text with styling that matches the portfolio's
 // dark, editorial theme. Used for the project detail (blog) body.
@@ -92,6 +93,6 @@ const components: PortableTextComponents = {
   },
 };
 
-export function PortableBody({ value }: { value: any[] }) {
+export function PortableBody({ value }: { value: NonNullable<SanityProjectDetail['body']> }) {
   return <PortableText value={value} components={components} />;
 }

@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { SectionHeading } from '../ui/SectionHeading';
 import { ScrollRevealText } from '../ui/ScrollRevealText';
-import { useSanityExperience } from '../../lib/sanityQueries';
+import { useSanityExperience, type SanityExperience } from '../../lib/sanityQueries';
 
 // Fallback content — used if Sanity is empty, loading, or unreachable.
 const fallbackExperiences = [
@@ -44,7 +44,7 @@ export function Experience() {
   );
 }
 
-function ExperienceItem({ data, index }: { data: any, index: number }) {
+function ExperienceItem({ data, index }: { data: SanityExperience, index: number }) {
   const isEven = index % 2 === 0;
   const ref = useRef(null);
   const isInView = useInView(ref, { margin: "-30% 0px -30% 0px" });

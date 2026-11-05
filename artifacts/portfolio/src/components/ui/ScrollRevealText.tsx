@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, type MotionValue } from 'framer-motion';
 import { useRef } from 'react';
 
 interface ScrollRevealTextProps {
@@ -75,7 +75,7 @@ function Character({
   className
 }: { 
   children: string; 
-  progress: any; 
+  progress: MotionValue<number>;
   range: [number, number];
   from: string;
   to: string;

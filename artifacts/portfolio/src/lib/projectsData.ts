@@ -6,25 +6,26 @@
 // Once you fill a project in Sanity Studio (with real screenshots), the CMS
 // version transparently takes over.
 // ---------------------------------------------------------------------------
+import type { PortableTextBlock } from '@portabletext/react';
 import type { SanityProject, SanityProjectDetail } from './sanityQueries';
 
 // --- Tiny Portable Text builders so fallback bodies share the CMS render path.
-const p = (text: string) => ({
+const p = (text: string): PortableTextBlock => ({
   _type: 'block',
   style: 'normal',
   children: [{ _type: 'span', text }],
 });
-const h2 = (text: string) => ({
+const h2 = (text: string): PortableTextBlock => ({
   _type: 'block',
   style: 'h2',
   children: [{ _type: 'span', text }],
 });
-const h3 = (text: string) => ({
+const h3 = (text: string): PortableTextBlock => ({
   _type: 'block',
   style: 'h3',
   children: [{ _type: 'span', text }],
 });
-const bullets = (items: string[]) =>
+const bullets = (items: string[]): PortableTextBlock[] =>
   items.map((text) => ({
     _type: 'block',
     style: 'normal',

@@ -4,7 +4,7 @@ import { Link } from 'wouter';
 import { SectionHeading } from '../ui/SectionHeading';
 import { ScrollRevealText } from '../ui/ScrollRevealText';
 import { ArrowRight, Github, ExternalLink } from 'lucide-react';
-import { useSanityProjects } from '../../lib/sanityQueries';
+import { useSanityProjects, type SanityProject } from '../../lib/sanityQueries';
 import { fallbackProjects, detailSlugByTitle } from '../../lib/projectsData';
 
 // Projects whose "Code" link is only a GitHub profile (no single repo) — hide
@@ -30,7 +30,7 @@ export function Projects() {
   );
 }
 
-function ProjectRow({ project, index }: { project: any, index: number }) {
+function ProjectRow({ project, index }: { project: SanityProject, index: number }) {
   const num = (index + 1).toString().padStart(2, '0');
   const ref = useRef(null);
   const isInView = useInView(ref, { margin: "-30% 0px -30% 0px" });
@@ -92,7 +92,7 @@ function ProjectRow({ project, index }: { project: any, index: number }) {
             </h3>
 
             <div className="flex flex-wrap gap-2">
-              {(project.tech || []).map((t: string) => (
+              {(project.tech || []).map((t) => (
                 <span key={t} className="text-[9px] font-sans text-muted-foreground uppercase tracking-[0.2em] px-2.5 py-0.5 bg-white/[0.03] border border-white/5 rounded-full group-hover:border-primary/20 transition-colors">
                   {t}
                 </span>

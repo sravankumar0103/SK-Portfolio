@@ -57,4 +57,10 @@ export const RULES: ReuseRule[] = [
     allowIn: ['src/lib/lenis.ts'],
     message: 'Scroll through scrollToY or scrollToElement in src/lib/lenis.ts; they carry the native fallback.',
   },
+  {
+    id: 'no-any',
+    audit: 'C6',
+    pattern: /:\s*any\b|\bas any\b|\bany\[\]/,
+    message: 'Use the real type: the Sanity interfaces in sanityQueries.ts, Portable Text types, or MotionValue.',
+  },
 ];

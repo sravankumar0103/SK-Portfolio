@@ -4,6 +4,7 @@
 // unreachable Sanity leaves the site visually identical to the hardcoded version.
 // ---------------------------------------------------------------------------
 import { useQuery } from '@tanstack/react-query';
+import type { PortableTextBlock } from '@portabletext/react';
 import { sanityFetch } from './sanity';
 
 const STALE_TIME = 1000 * 60; // 1 min — content is not time-critical
@@ -40,6 +41,14 @@ export interface SanityImage {
   caption?: string;
 }
 
+// An image member of `body`: the projection maps it to `{ _type, url, caption }`, no `children`.
+export interface SanityBodyImage {
+  _type: 'image';
+  _key?: string;
+  url?: string;
+  caption?: string;
+}
+
 export interface SanityProjectDetail {
   title: string;
   description: string;
@@ -53,8 +62,8 @@ export interface SanityProjectDetail {
   role?: string;
   timeline?: string;
   coverImageUrl?: string;
-  // Portable Text blocks; typed loosely to avoid a hard dependency on internal types.
-  body?: any[];
+  // Portable Text blocks, plus image members as the GROQ projection below returns them.
+  body?: Array<PortableTextBlock | SanityBodyImage>;
   gallery?: SanityImage[];
   outcomes?: string[];
 }
