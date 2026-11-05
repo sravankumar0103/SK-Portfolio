@@ -636,6 +636,11 @@ html.lenis, html.lenis body {
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* Not `inline`: the variable must be emitted so var(--ease-out-expo) resolves. */
+@theme {
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 :root {
   --background: 11 6% 6%;
   /* near-black warm obsidian */
@@ -714,20 +719,20 @@ html.lenis, html.lenis body {
 }
 
 .premium-card-hover {
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.4s var(--ease-out-expo);
 }
 
 .premium-card-hover:hover {
   background: rgba(255, 255, 255, 0.05);
-  border-color: hsla(11, 81%, 57%, 0.3);
+  border-color: hsl(var(--primary) / 0.3);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4),
-    0 0 20px hsla(11, 81%, 57%, 0.06);
+    0 0 20px hsl(var(--primary) / 0.06);
   transform: translateY(-2px);
 }
 
 /* Orange accent text */
 .gold-text {
-  background: linear-gradient(135deg, hsl(11, 81%, 57%) 0%, hsl(11, 81%, 65%) 50%, hsl(11, 81%, 45%) 100%);
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(11, 81%, 65%) 50%, hsl(11, 81%, 45%) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -744,7 +749,7 @@ section {
 }
 
 .premium-gradient-text {
-  background: linear-gradient(to right, #ffffff 0%, #ffffff 65%, hsl(11, 81%, 57%) 100%);
+  background: linear-gradient(to right, #ffffff 0%, #ffffff 65%, hsl(var(--primary)) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -752,7 +757,7 @@ section {
 
 /* Glow effects */
 .glow-hover:hover {
-  box-shadow: 0 0 30px hsla(11, 81%, 57%, 0.28);
+  box-shadow: 0 0 30px hsl(var(--primary) / 0.28);
 }
 
 /* Hover lift — subtle, not dramatic */

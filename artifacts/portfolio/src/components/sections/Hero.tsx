@@ -4,6 +4,7 @@ import { HeroScene } from '../3d/HeroScene';
 import { Github, Linkedin, Mail, ArrowRight } from 'lucide-react';
 import { Magnetic } from '../ui/Magnetic';
 import { useSanitySiteSettings } from '../../lib/sanityQueries';
+import { EASE_OUT_EXPO } from '../../lib/motion';
 
 // Fallback content — used if Sanity is empty, loading, or unreachable.
 const FALLBACK_RESUME_URL =
@@ -37,7 +38,7 @@ export function Hero() {
                 <motion.span
                   initial={{ y: "100%" }}
                   animate={{ y: 0 }}
-                  transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
                   className="block whitespace-nowrap premium-gradient-text"
                 >
                   {firstName}
@@ -47,7 +48,7 @@ export function Hero() {
                 <motion.span
                   initial={{ y: "100%" }}
                   animate={{ y: 0 }}
-                  transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+                  transition={{ duration: 1.2, ease: EASE_OUT_EXPO, delay: 0.1 }}
                   className="block premium-gradient-text"
                 >
                   {lastName}

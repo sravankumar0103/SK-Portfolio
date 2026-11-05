@@ -6,11 +6,10 @@ import { useSanityProject, orFallback, type SanityProjectDetail } from '../lib/s
 import { fallbackProjectDetails } from '../lib/projectsData';
 import { imageUrl } from '../lib/sanity';
 import { reassert, scrollToY } from '../lib/lenis';
+import { EASE_OUT_QUINT } from '../lib/motion';
 import { PortableBody } from '../components/ui/PortableBody';
 import { CoverflowGallery } from '../components/ui/CoverflowGallery';
 import NotFound from './not-found';
-
-const EASE = [0.22, 1, 0.36, 1] as const;
 
 // Combine CMS data with the bundled in-depth write-up.
 // The curated fallback supplies the detailed text (overview, body, outcomes) so
@@ -122,7 +121,7 @@ export default function ProjectDetail() {
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: EASE, delay: 0.05 }}
+              transition={{ duration: 0.8, ease: EASE_OUT_QUINT, delay: 0.05 }}
               className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-semibold leading-[1.02] tracking-tight text-primary"
             >
               {project.title}
@@ -132,7 +131,7 @@ export default function ProjectDetail() {
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: EASE, delay: 0.15 }}
+                transition={{ duration: 0.8, ease: EASE_OUT_QUINT, delay: 0.15 }}
                 className="mt-7 text-base md:text-xl font-sans text-muted-foreground leading-relaxed max-w-3xl"
               >
                 {project.overview}
@@ -143,7 +142,7 @@ export default function ProjectDetail() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: EASE, delay: 0.25 }}
+                transition={{ duration: 0.8, ease: EASE_OUT_QUINT, delay: 0.25 }}
                 className="mt-10 flex flex-wrap items-center gap-3"
               >
                 {showGithub && (
@@ -179,7 +178,7 @@ export default function ProjectDetail() {
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: EASE }}
+            transition={{ duration: 0.8, ease: EASE_OUT_QUINT }}
             className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]"
           >
             <img
@@ -231,7 +230,7 @@ export default function ProjectDetail() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-10% 0px' }}
-                transition={{ duration: 0.7, ease: EASE }}
+                transition={{ duration: 0.7, ease: EASE_OUT_QUINT }}
                 className="[&>*:first-child]:!mt-0"
               >
                 <PortableBody value={project.body} />
@@ -252,7 +251,7 @@ export default function ProjectDetail() {
                       initial={{ opacity: 0, y: 16 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true, margin: '-10% 0px' }}
-                      transition={{ duration: 0.5, ease: EASE, delay: i * 0.05 }}
+                      transition={{ duration: 0.5, ease: EASE_OUT_QUINT, delay: i * 0.05 }}
                       className="premium-card premium-card-hover rounded-2xl p-5 flex items-start gap-3"
                     >
                       <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />

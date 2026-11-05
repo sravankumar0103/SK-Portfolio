@@ -135,8 +135,7 @@ export function Contact() {
                 Let&apos;s build <br />
                 <ScrollRevealText 
                   text="something" 
-                  to="hsl(11, 81%, 57%)" 
-                  from="rgba(255,255,255,0.1)"
+                  tone="primary"
                   className="italic tracking-tight" 
                 /> <br />
                 great.

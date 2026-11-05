@@ -70,4 +70,32 @@ export const RULES: ReuseRule[] = [
     allowIn: ['src/lib/sanityQueries.ts'],
     message: 'Fallbacks are applied by the hooks and by orFallback in src/lib/sanityQueries.ts; do not write `x.length ? x : fallback` in a component.',
   },
+  {
+    id: 'ease-constants',
+    audit: 'C3',
+    pattern: /0\.22,\s*1,\s*0\.36,\s*1|0\.16,\s*1,\s*0\.3,\s*1/,
+    allowIn: ['src/lib/motion.ts', 'src/globals.css'],
+    message: 'Import EASE_OUT_QUINT or EASE_OUT_EXPO from src/lib/motion.ts; in CSS use var(--ease-out-expo) or the ease-out-expo utility.',
+  },
+  {
+    id: 'viewport-constants',
+    audit: 'C3',
+    pattern: /-30% 0px -30% 0px/,
+    allowIn: ['src/lib/motion.ts'],
+    message: 'Import VIEWPORT_CENTER_MARGIN from src/lib/motion.ts, or spread a preset (rowEnter, expandOnView, slideInFromRight).',
+  },
+  {
+    id: 'primary-literal',
+    audit: 'C16',
+    pattern: /hsla?\(11,\s*81%,\s*57%/,
+    allowIn: ['src/components/ui/ScrollRevealText.tsx'],
+    message: 'Use the primary token: hsl(var(--primary) / <alpha>) in CSS and arbitrary values. Only ScrollRevealText\'s TONES map keeps the literal, because framer-motion cannot interpolate var().',
+  },
+  {
+    id: 'reveal-colours',
+    audit: 'C16',
+    pattern: /#c5c1b0|#1a1918|rgba\(255,\s*255,\s*255,\s*0\.1\)/,
+    allowIn: ['src/components/ui/ScrollRevealText.tsx'],
+    message: 'Pass tone="default" | "primary" | "muted" to ScrollRevealText; the colour strings live in its TONES map.',
+  },
 ];

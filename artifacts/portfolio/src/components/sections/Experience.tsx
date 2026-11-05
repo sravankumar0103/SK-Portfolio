@@ -3,6 +3,7 @@ import { motion, useInView } from 'framer-motion';
 import { SectionHeading } from '../ui/SectionHeading';
 import { ScrollRevealText } from '../ui/ScrollRevealText';
 import { useSanityExperience, type SanityExperience } from '../../lib/sanityQueries';
+import { VIEWPORT_CENTER_MARGIN, rowEnter, expandOnView } from '../../lib/motion';
 
 export function Experience() {
   const experiences = useSanityExperience();
@@ -30,23 +31,16 @@ export function Experience() {
 function ExperienceItem({ data, index }: { data: SanityExperience, index: number }) {
   const isEven = index % 2 === 0;
   const ref = useRef(null);
-  const isInView = useInView(ref, { margin: "-30% 0px -30% 0px" });
+  const isInView = useInView(ref, { margin: VIEWPORT_CENTER_MARGIN });
 
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 1, y: 0, scale: 0.95 }}
-      whileInView={{
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1] }
-      }}
-      viewport={{ once: false, margin: "-30% 0px -30% 0px" }}
+      {...rowEnter}
       className={`relative flex flex-col md:flex-row gap-8 md:gap-16 group ${isEven ? 'md:flex-row-reverse' : ''}`}
     >
       {/* Timeline dot */}
-      <div className="absolute -left-[1px] md:left-1/2 md:-ml-[5px] top-2 w-2.5 h-2.5 rounded-full bg-primary shadow-[0_0_10px_hsla(11,81%,57%,0.5)] z-10" />
+      <div className="absolute -left-[1px] md:left-1/2 md:-ml-[5px] top-2 w-2.5 h-2.5 rounded-full bg-primary shadow-[0_0_10px_hsl(var(--primary)/0.5)] z-10" />
 
       {/* Date */}
       <div className={`hidden md:flex w-1/2 flex-col pt-1 ${isEven ? 'items-start text-left' : 'items-end text-right'}`}>
@@ -62,16 +56,7 @@ function ExperienceItem({ data, index }: { data: SanityExperience, index: number
           <div className="text-base font-sans font-medium text-foreground/80 mb-2">{data.role}</div>
           <span className="md:hidden block text-xs font-sans text-muted-foreground uppercase tracking-widest mb-4">{data.date}</span>
 
-          <motion.div
-            className="overflow-hidden"
-            initial={{ height: 0, opacity: 0 }}
-            whileInView={{ height: "auto", opacity: 1 }}
-            viewport={{ once: false, margin: "-30% 0px -30% 0px" }}
-            transition={{
-              height: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
-              opacity: { duration: 0.5, delay: 0.2 }
-            }}
-          >
+          <motion.div className="overflow-hidden" {...expandOnView}>
             <p className="text-sm font-sans text-muted-foreground leading-relaxed pt-2">
               {data.description}
             </p>

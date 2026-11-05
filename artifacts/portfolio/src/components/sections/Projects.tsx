@@ -6,6 +6,7 @@ import { ScrollRevealText } from '../ui/ScrollRevealText';
 import { ArrowRight, Github, ExternalLink } from 'lucide-react';
 import { useSanityProjects, type SanityProject } from '../../lib/sanityQueries';
 import { detailSlugByTitle } from '../../lib/projectsData';
+import { VIEWPORT_CENTER_MARGIN, rowEnter, expandOnView, slideInFromRight } from '../../lib/motion';
 
 // Projects whose "Code" link is only a GitHub profile (no single repo) — hide
 // the Code button for these.
@@ -32,7 +33,7 @@ export function Projects() {
 function ProjectRow({ project, index }: { project: SanityProject, index: number }) {
   const num = (index + 1).toString().padStart(2, '0');
   const ref = useRef(null);
-  const isInView = useInView(ref, { margin: "-30% 0px -30% 0px" });
+  const isInView = useInView(ref, { margin: VIEWPORT_CENTER_MARGIN });
   // Resolve the detail-page link. Every project that has a slug — either from
   // Sanity or matched by title to a bundled write-up — gets a working page.
   // The Sanity "Enable detail page" toggle only decides whether the page shows
@@ -46,18 +47,11 @@ function ProjectRow({ project, index }: { project: SanityProject, index: number 
     <motion.div
       ref={ref}
       id={slug ? `project-${slug}` : undefined}
-      initial={{ opacity: 1, y: 0, scale: 0.95 }}
-      whileInView={{
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1] }
-      }}
-      viewport={{ once: false, margin: "-30% 0px -30% 0px" }}
-      className="group relative border-b border-white/5 py-6 md:py-8 px-4 md:px-6 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden"
+      {...rowEnter}
+      className="group relative border-b border-white/5 py-6 md:py-8 px-4 md:px-6 transition-all duration-700 ease-out-expo overflow-hidden"
     >
       {/* Cinematic Background Hover */}
-      <div className="absolute inset-0 bg-white/[0.01] translate-y-full group-hover:translate-y-0 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]" />
+      <div className="absolute inset-0 bg-white/[0.01] translate-y-full group-hover:translate-y-0 transition-transform duration-700 ease-out-expo" />
       <div className="absolute inset-y-0 left-0 w-1 bg-primary scale-y-0 group-hover:scale-y-100 transition-transform duration-500 origin-bottom" />
 
       <div className="relative z-10 flex flex-col md:flex-row gap-4 md:gap-12 md:items-start">
@@ -74,8 +68,7 @@ function ProjectRow({ project, index }: { project: SanityProject, index: number 
                   <ScrollRevealText
                     text={project.title}
                     isActive={isInView}
-                    from="rgba(255, 255, 255, 0.1)"
-                    to="hsl(11, 81%, 57%)"
+                    tone="primary"
                     characterClassName="group-hover:!text-foreground"
                   />
                 </Link>
@@ -83,8 +76,7 @@ function ProjectRow({ project, index }: { project: SanityProject, index: number 
                 <ScrollRevealText
                   text={project.title}
                   isActive={isInView}
-                  from="rgba(255, 255, 255, 0.1)"
-                  to="hsl(11, 81%, 57%)"
+                  tone="primary"
                   characterClassName="group-hover:!text-foreground"
                 />
               )}
@@ -99,16 +91,7 @@ function ProjectRow({ project, index }: { project: SanityProject, index: number 
             </div>
           </div>
 
-          <motion.div
-            className="overflow-hidden"
-            initial={{ height: 0, opacity: 0 }}
-            whileInView={{ height: "auto", opacity: 1 }}
-            viewport={{ once: false, margin: "-30% 0px -30% 0px" }}
-            transition={{
-              height: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
-              opacity: { duration: 0.5, delay: 0.2 }
-            }}
-          >
+          <motion.div className="overflow-hidden" {...expandOnView}>
             <p className="text-sm font-sans text-muted-foreground leading-relaxed pt-6 max-w-2xl">
               {project.description}
             </p>
@@ -117,13 +100,7 @@ function ProjectRow({ project, index }: { project: SanityProject, index: number 
 
         {/* Action Icons */}
         <div className="flex items-center gap-4 self-end md:self-start pt-1.5">
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: false, margin: "-30% 0px -30% 0px" }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="flex items-center gap-3"
-          >
+          <motion.div {...slideInFromRight(0.2)} className="flex items-center gap-3">
             {project.github && !NO_CODE_SLUGS.has(slug ?? '') && (
               <a
                 href={project.github}

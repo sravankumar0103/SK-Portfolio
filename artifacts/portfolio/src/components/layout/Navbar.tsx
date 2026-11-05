@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { scrollToElement } from '@/lib/lenis';
+import { EASE_OUT_QUINT } from '@/lib/motion';
 
 type NavItem = {
   name: string;
@@ -68,7 +69,7 @@ export function Navbar() {
       <motion.div
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 1, ease: EASE_OUT_QUINT }}
         className="flex items-center px-6 py-2 rounded-full border border-white/5 bg-black/30 backdrop-blur-md shadow-[0_8px_32px_0_rgba(0,0,0,0.8)] pointer-events-auto"
       >
         <nav className="flex gap-5 md:gap-7 items-center">

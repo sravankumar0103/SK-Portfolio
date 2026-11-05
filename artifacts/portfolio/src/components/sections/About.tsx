@@ -3,8 +3,12 @@ import { SectionHeading } from '../ui/SectionHeading';
 import { ScrollRevealText } from '../ui/ScrollRevealText';
 import { useSanitySiteSettings } from '../../lib/sanityQueries';
 
+const ABOUT_HIGHLIGHT = "I don't just write code; I build solutions that work.";
+
 export function About() {
   const { data: settings } = useSanitySiteSettings();
+  // Sanity's highlight only travels with Sanity's paragraph; the bundled paragraph keeps its own sentence.
+  const highlight = settings?.aboutPara1 ? settings.aboutHighlight || ABOUT_HIGHLIGHT : ABOUT_HIGHLIGHT;
 
   return (
     <section id="about" className="py-12 md:py-20 relative">
@@ -19,26 +23,16 @@ export function About() {
             transition={{ duration: 0.8 }}
             className="prose prose-invert max-w-none font-sans text-foreground leading-relaxed"
           >
-            {settings?.aboutPara1 ? (
-              <p className="text-lg md:text-xl font-light mb-6">
-                {settings.aboutPara1}{' '}
-                <ScrollRevealText
-                  text={settings.aboutHighlight || "I don't just write code; I build solutions that work."}
-                  className="font-medium inline-block"
-                  from="#1a1918"
-                  to="#c5c1b0"
-                />
-              </p>
-            ) : (
-              <p className="text-lg md:text-xl font-light mb-6">
-                I am an <span className="text-foreground font-medium italic">AI & Full-Stack Developer</span> focused on building smart, high-quality applications. I combine the power of Artificial Intelligence with full-stack development to create tools that actually solve problems. <ScrollRevealText
-                  text="I don't just write code; I build solutions that work."
-                  className="font-medium inline-block"
-                  from="#1a1918"
-                  to="#c5c1b0"
-                />
-              </p>
-            )}
+            <p className="text-lg md:text-xl font-light mb-6">
+              {settings?.aboutPara1 ? (
+                <>{settings.aboutPara1}{' '}</>
+              ) : (
+                <>
+                  I am an <span className="text-foreground font-medium italic">AI & Full-Stack Developer</span> focused on building smart, high-quality applications. I combine the power of Artificial Intelligence with full-stack development to create tools that actually solve problems.{' '}
+                </>
+              )}
+              <ScrollRevealText text={highlight} tone="muted" className="font-medium inline-block" />
+            </p>
             {settings?.aboutPara2 ? (
               <p className="text-muted-foreground leading-relaxed">{settings.aboutPara2}</p>
             ) : (

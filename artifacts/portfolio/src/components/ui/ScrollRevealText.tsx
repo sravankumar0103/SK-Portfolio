@@ -1,11 +1,17 @@
 import { motion, useScroll, useTransform, type MotionValue } from 'framer-motion';
 import { useRef } from 'react';
 
+// framer-motion cannot interpolate CSS variables, so these stay literal colours.
+const TONES = {
+  default: { from: "rgba(255, 255, 255, 0.1)", to: "#c5c1b0" },
+  primary: { from: "rgba(255, 255, 255, 0.1)", to: "hsl(11, 81%, 57%)" },
+  muted: { from: "#1a1918", to: "#c5c1b0" },
+} as const;
+
 interface ScrollRevealTextProps {
   text: string;
   className?: string;
-  from?: string;
-  to?: string;
+  tone?: keyof typeof TONES;
   characterClassName?: string;
   isActive?: boolean;
 }
@@ -13,11 +19,11 @@ interface ScrollRevealTextProps {
 export function ScrollRevealText({ 
   text, 
   className, 
-  from = "rgba(255, 255, 255, 0.1)", 
-  to = "#c5c1b0",
+  tone = "default",
   characterClassName = "",
   isActive
 }: ScrollRevealTextProps) {
+  const { from, to } = TONES[tone];
   const targetRef = useRef<HTMLSpanElement>(null);
   const { scrollYProgress } = useScroll({
     target: targetRef,

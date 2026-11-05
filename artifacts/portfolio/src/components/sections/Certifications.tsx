@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { ExternalLink } from 'lucide-react';
 import { SectionHeading } from '../ui/SectionHeading';
 import { useSanityCertifications } from '../../lib/sanityQueries';
+import { slideInFromRight } from '../../lib/motion';
 
 export function Certifications() {
   const certs = useSanityCertifications();
@@ -42,13 +43,7 @@ export function Certifications() {
                       {cert.date}
                     </div>
                     
-                    <motion.div
-                      initial={{ opacity: 0, x: 20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: false, margin: "-30% 0px -30% 0px" }}
-                      transition={{ duration: 0.5, delay: 0.1 }}
-                      className="shrink-0"
-                    >
+                    <motion.div {...slideInFromRight(0.1)} className="shrink-0">
                       {cert.link && (
                         <div className="flex items-center gap-2 px-2.5 py-1 text-muted-foreground hover:text-primary bg-white/[0.03] rounded-full border border-white/5 hover:border-primary/20 transition-all duration-300">
                           <span className="text-[9px] font-sans font-semibold uppercase tracking-widest">View</span>
