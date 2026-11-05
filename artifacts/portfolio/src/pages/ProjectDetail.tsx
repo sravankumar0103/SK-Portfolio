@@ -3,10 +3,13 @@ import { Link, useParams } from 'wouter';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import { Github, ExternalLink, ArrowUpRight, Sparkles } from 'lucide-react';
 import { useSanityProject, orFallback, type SanityProjectDetail } from '../lib/sanityQueries';
-import { fallbackProjectDetails } from '../lib/projectsData';
+import { fallbackProjectDetails, codeUrl, liveUrl } from '../lib/projectsData';
 import { imageUrl } from '../lib/sanity';
 import { reassert, scrollToY } from '../lib/lenis';
 import { EASE_OUT_QUINT } from '../lib/motion';
+import { cn } from '../lib/utils';
+import { CONTAINER } from '../components/layout/Section';
+import { PageShell } from '../components/layout/PageShell';
 import { PortableBody } from '../components/ui/PortableBody';
 import { CoverflowGallery } from '../components/ui/CoverflowGallery';
 import NotFound from './not-found';
@@ -102,12 +105,12 @@ export default function ProjectDetail() {
   if (!project) return <NotFound />;
 
   const cover = imageUrl(project.coverImageUrl, 2000);
-  const hasLive = project.live && project.live !== '#';
-  const showGithub = Boolean(project.github) && slug !== 'hexapod-robotic-arm';
-  const showActions = showGithub || hasLive;
+  const codeHref = codeUrl(project, slug);
+  const liveHref = liveUrl(project);
+  const showActions = Boolean(codeHref || liveHref);
 
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-primary/30 selection:text-primary">
+    <PageShell>
       {/* Reading progress */}
       <motion.div
         className="fixed top-0 left-0 right-0 h-[2px] bg-primary z-[60] origin-left"
@@ -116,7 +119,7 @@ export default function ProjectDetail() {
 
       {/* ---------- HERO (full-bleed, solid background) ---------- */}
       <section className="relative overflow-hidden">
-        <div className="relative container mx-auto max-w-7xl px-6 md:px-12 pt-16 md:pt-20 pb-6 md:pb-8">
+        <div className={cn(CONTAINER, 'relative max-w-7xl pt-16 md:pt-20 pb-6 md:pb-8')}>
           <div className="max-w-4xl">
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
@@ -145,9 +148,9 @@ export default function ProjectDetail() {
                 transition={{ duration: 0.8, ease: EASE_OUT_QUINT, delay: 0.25 }}
                 className="mt-10 flex flex-wrap items-center gap-3"
               >
-                {showGithub && (
+                {codeHref && (
                   <a
-                    href={project.github}
+                    href={codeHref}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-foreground rounded-full border border-white/10 hover:border-primary/40 hover:bg-white/[0.04] transition-all hover-lift"
@@ -155,9 +158,9 @@ export default function ProjectDetail() {
                     <Github className="w-4 h-4" /> View Code
                   </a>
                 )}
-                {hasLive && (
+                {liveHref && (
                   <a
-                    href={project.live}
+                    href={liveHref}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-background bg-primary hover:bg-primary/90 rounded-full transition-all glow-hover hover-lift"
@@ -173,7 +176,7 @@ export default function ProjectDetail() {
 
       {/* ---------- COVER (compact, full image visible) ---------- */}
       {cover && (
-        <section className="container mx-auto max-w-3xl px-6 md:px-12 pt-4">
+        <section className={cn(CONTAINER, 'max-w-3xl pt-4')}>
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -192,9 +195,7 @@ export default function ProjectDetail() {
 
       {/* ---------- BODY (sidebar + full-width content column) ---------- */}
       <section
-        className={`container mx-auto max-w-7xl px-6 md:px-12 pb-16 md:pb-20 ${
-          cover ? 'pt-12 md:pt-16' : 'pt-8 md:pt-10'
-        }`}
+        className={cn(CONTAINER, 'max-w-7xl pb-16 md:pb-20', cover ? 'pt-12 md:pt-16' : 'pt-8 md:pt-10')}
       >
         <div className="grid lg:grid-cols-[240px_1fr] gap-10 lg:gap-16 xl:gap-20">
           {/* Sticky spec sidebar — thin orange rule on its right edge, only as
@@ -277,7 +278,7 @@ export default function ProjectDetail() {
 
       {/* ---------- FOOTER CTA (full width) ---------- */}
       <section className="border-t border-white/5">
-        <div className="container mx-auto max-w-7xl px-6 md:px-12 py-16">
+        <div className={cn(CONTAINER, 'max-w-7xl py-16')}>
           <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground/60 mb-2">Explore more</p>
           <Link
             href={backHref}
@@ -288,7 +289,7 @@ export default function ProjectDetail() {
           </Link>
         </div>
       </section>
-    </div>
+    </PageShell>
   );
 }
 

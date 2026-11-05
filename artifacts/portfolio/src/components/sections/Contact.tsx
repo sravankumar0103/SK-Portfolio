@@ -5,6 +5,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useToast } from "@/hooks/use-toast";
+import { cn } from '@/lib/utils';
+import { CONTAINER } from '../layout/Section';
 import { ScrollRevealText } from '../ui/ScrollRevealText';
 import { useSanitySiteSettings, orFallback } from '../../lib/sanityQueries';
 import { FALLBACK_EMAIL, fallbackSocials } from '../../lib/fallbackContent';
@@ -116,7 +118,7 @@ export function Contact() {
 
   return (
     <section id="contact" className="pt-4 md:pt-12 pb-2 relative overflow-hidden">
-      <div className="container mx-auto px-6 md:px-12 relative z-10">
+      <div className={cn(CONTAINER, 'relative z-10')}>
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-24 items-start">
 
           {/* Info Side (Left) */}

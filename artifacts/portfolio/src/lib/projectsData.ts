@@ -107,6 +107,21 @@ export const detailSlugByTitle: Record<string, string> = Object.fromEntries(
     .map((p) => [p.title, p.slug as string]),
 );
 
+// Projects whose "Code" link is only a GitHub profile (no single repo) — they get no Code link.
+const NO_CODE_SLUGS = new Set(['hexapod-robotic-arm']);
+
+/** The repo link to show for a project, or undefined when it should have none. */
+export function codeUrl(project: { github?: string }, slug?: string): string | undefined {
+  if (!project.github || NO_CODE_SLUGS.has(slug ?? '')) return undefined;
+  return project.github;
+}
+
+/** The live-demo link to show for a project, or undefined when it has none ('#' is a placeholder). */
+export function liveUrl(project: { live?: string }): string | undefined {
+  if (!project.live || project.live === '#') return undefined;
+  return project.live;
+}
+
 // ---------- Detail pages (blog), keyed by slug ----------
 export const fallbackProjectDetails: Record<string, SanityProjectDetail> = {
   arogyalens: {

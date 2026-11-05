@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Hero } from '@/components/sections/Hero';
 import { Navbar } from '@/components/layout/Navbar';
+import { PageShell } from '@/components/layout/PageShell';
 import { About } from '@/components/sections/About';
 import { Experience } from '@/components/sections/Experience';
 import { Skills } from '@/components/sections/Skills';
@@ -57,7 +58,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-primary/30 selection:text-primary">
+    <PageShell>
       <Navbar />
       <Hero />
       <About />
@@ -66,6 +67,6 @@ export default function Home() {
       <Projects />
       <Certifications />
       <Contact />
-    </div>
+    </PageShell>
   );
 }

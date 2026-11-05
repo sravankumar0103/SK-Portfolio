@@ -1,32 +1,28 @@
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Link } from 'wouter';
+import { Section } from '../layout/Section';
 import { SectionHeading } from '../ui/SectionHeading';
 import { ScrollRevealText } from '../ui/ScrollRevealText';
+import { PillLink } from '../ui/PillLink';
 import { ArrowRight, Github, ExternalLink } from 'lucide-react';
 import { useSanityProjects, type SanityProject } from '../../lib/sanityQueries';
-import { detailSlugByTitle } from '../../lib/projectsData';
+import { detailSlugByTitle, codeUrl, liveUrl } from '../../lib/projectsData';
 import { VIEWPORT_CENTER_MARGIN, rowEnter, expandOnView, slideInFromRight } from '../../lib/motion';
-
-// Projects whose "Code" link is only a GitHub profile (no single repo) — hide
-// the Code button for these.
-const NO_CODE_SLUGS = new Set(['hexapod-robotic-arm']);
 
 export function Projects() {
   const projects = useSanityProjects();
 
   return (
-    <section id="projects" className="py-12 md:py-20 relative">
-      <div className="container mx-auto px-6 md:px-12">
-        <SectionHeading num="04" title="Selected Works" />
+    <Section id="projects">
+      <SectionHeading num="04" title="Selected Works" />
 
-        <div className="flex flex-col mt-16 max-w-5xl">
-          {projects.map((project, idx) => (
-            <ProjectRow key={project.title} project={project} index={idx} />
-          ))}
-        </div>
+      <div className="flex flex-col mt-16 max-w-5xl">
+        {projects.map((project, idx) => (
+          <ProjectRow key={project.title} project={project} index={idx} />
+        ))}
       </div>
-    </section>
+    </Section>
   );
 }
 
@@ -42,6 +38,8 @@ function ProjectRow({ project, index }: { project: SanityProject, index: number 
   const fallbackSlug = detailSlugByTitle[project.title];
   const slug = project.slug || fallbackSlug;
   const detailHref = slug ? `/projects/${slug}` : null;
+  const code = codeUrl(project, slug);
+  const live = liveUrl(project);
 
   return (
     <motion.div
@@ -101,30 +99,8 @@ function ProjectRow({ project, index }: { project: SanityProject, index: number 
         {/* Action Icons */}
         <div className="flex items-center gap-4 self-end md:self-start pt-1.5">
           <motion.div {...slideInFromRight(0.2)} className="flex items-center gap-3">
-            {project.github && !NO_CODE_SLUGS.has(slug ?? '') && (
-              <a
-                href={project.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-2.5 py-1 text-muted-foreground hover:text-primary transition-all duration-300 hover:bg-white/[0.03] rounded-full border border-white/5 hover:border-primary/20 group/code"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <span className="text-[9px] font-sans font-semibold uppercase tracking-widest opacity-70 group-hover/code:opacity-100 transition-opacity">Code</span>
-                <Github className="w-3.5 h-3.5" />
-              </a>
-            )}
-            {project.live && project.live !== '#' && (
-              <a
-                href={project.live}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-2.5 py-1 text-muted-foreground hover:text-primary transition-all duration-300 hover:bg-white/[0.03] rounded-full border border-white/5 hover:border-primary/20 group/live"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <span className="text-[9px] font-sans font-semibold uppercase tracking-widest opacity-70 group-hover/live:opacity-100 transition-opacity">Live</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-            )}
+            {code && <PillLink label="Code" icon={<Github />} href={code} />}
+            {live && <PillLink label="Live" icon={<ExternalLink />} href={live} />}
           </motion.div>
           {detailHref ? (
             <Link

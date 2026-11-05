@@ -2,9 +2,11 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { HeroScene } from '../3d/HeroScene';
 import { Github, Linkedin, Mail, ArrowRight } from 'lucide-react';
+import { CONTAINER } from '../layout/Section';
 import { Magnetic } from '../ui/Magnetic';
 import { useSanitySiteSettings } from '../../lib/sanityQueries';
 import { EASE_OUT_EXPO } from '../../lib/motion';
+import { cn } from '@/lib/utils';
 
 // Fallback content — used if Sanity is empty, loading, or unreachable.
 const FALLBACK_RESUME_URL =
@@ -25,7 +27,7 @@ export function Hero() {
         <HeroScene />
       </div>
 
-      <div className="relative z-10 w-full container mx-auto px-6 md:px-12 flex flex-col justify-end md:justify-center h-full pb-[15vh] md:pt-20 md:pb-0">
+      <div className={cn(CONTAINER, 'relative z-10 w-full flex flex-col justify-end md:justify-center h-full pb-[15vh] md:pt-20 md:pb-0')}>
         <div className="w-full md:w-3/5 md:pr-12">
           <motion.div
             initial={{ opacity: 0 }}

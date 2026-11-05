@@ -98,4 +98,32 @@ export const RULES: ReuseRule[] = [
     allowIn: ['src/components/ui/ScrollRevealText.tsx'],
     message: 'Pass tone="default" | "primary" | "muted" to ScrollRevealText; the colour strings live in its TONES map.',
   },
+  {
+    id: 'container-shell',
+    audit: 'C1',
+    pattern: /container mx-auto (max-w-\w+ )?px-6 md:px-12/,
+    allowIn: ['src/components/layout/Section.tsx'],
+    message: 'Use <Section> for a page section, or cn(CONTAINER, \'…\') from src/components/layout/Section.tsx for a custom shell; do not retype the container classes.',
+  },
+  {
+    id: 'page-shell',
+    audit: '—',
+    pattern: /min-h-screen bg-background text-foreground overflow-x-hidden/,
+    allowIn: ['src/components/layout/PageShell.tsx'],
+    message: 'Wrap a page in <PageShell> from src/components/layout/PageShell.tsx.',
+  },
+  {
+    id: 'pill-chip',
+    audit: 'C4',
+    pattern: /gap-2 px-2\.5 py-1 /,
+    allowIn: ['src/components/ui/PillLink.tsx'],
+    message: 'Use <PillLink> from src/components/ui/PillLink.tsx for the small Code / Live / View chips.',
+  },
+  {
+    id: 'project-link-rules',
+    audit: 'C14',
+    pattern: /hexapod-robotic-arm|!==\s*'#'/,
+    allowIn: ['src/lib/projectsData.ts'],
+    message: 'Use codeUrl(project, slug) and liveUrl(project) from src/lib/projectsData.ts; they hold the "no code link" and "no live link" rules.',
+  },
 ];

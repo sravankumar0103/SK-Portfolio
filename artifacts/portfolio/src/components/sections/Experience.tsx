@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
+import { Section } from '../layout/Section';
 import { SectionHeading } from '../ui/SectionHeading';
 import { ScrollRevealText } from '../ui/ScrollRevealText';
 import { useSanityExperience, type SanityExperience } from '../../lib/sanityQueries';
@@ -9,22 +10,20 @@ export function Experience() {
   const experiences = useSanityExperience();
 
   return (
-    <section id="experience" className="py-12 md:py-20 relative">
-      <div className="container mx-auto px-6 md:px-12">
-        <SectionHeading num="02" title="Experience" />
+    <Section id="experience">
+      <SectionHeading num="02" title="Experience" />
 
-        <div className="relative max-w-4xl mt-16 pl-6 md:pl-0">
-          {/* Timeline central line */}
-          <div className="absolute left-[3px] md:left-1/2 top-0 bottom-0 w-[1px] bg-primary/20" />
+      <div className="relative max-w-4xl mt-16 pl-6 md:pl-0">
+        {/* Timeline central line */}
+        <div className="absolute left-[3px] md:left-1/2 top-0 bottom-0 w-[1px] bg-primary/20" />
 
-          <div className="space-y-16">
-            {experiences.map((exp, index) => (
-              <ExperienceItem key={index} data={exp} index={index} />
-            ))}
-          </div>
+        <div className="space-y-16">
+          {experiences.map((exp, index) => (
+            <ExperienceItem key={index} data={exp} index={index} />
+          ))}
         </div>
       </div>
-    </section>
+    </Section>
   );
 }
 
