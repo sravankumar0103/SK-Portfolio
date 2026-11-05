@@ -17,6 +17,10 @@ function getLenis(): Lenis | null {
   return instance;
 }
 
+function prefersReducedMotion(): boolean {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
 export function scrollToY(top: number, options: { immediate?: boolean } = {}): void {
   const lenis = getLenis();
   if (options.immediate) {
@@ -34,7 +38,7 @@ export function scrollToY(top: number, options: { immediate?: boolean } = {}): v
   if (lenis) {
     lenis.scrollTo(top, { duration: SCROLL_DURATION, easing: scrollEasing });
   } else {
-    window.scrollTo({ top, behavior: 'smooth' });
+    window.scrollTo({ top, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
   }
 }
 
@@ -43,7 +47,12 @@ export function scrollToElement(target: HTMLElement, offsetTop: number): void {
   if (lenis) {
     lenis.scrollTo(target, { offset: -offsetTop, duration: SCROLL_DURATION, easing: scrollEasing });
   } else {
-    window.scrollBy({ top: target.getBoundingClientRect().top - offsetTop, behavior: 'smooth' });
+    // Lenis subtracts the target's scroll-margin-top on top of `offset`; match it.
+    const scrollMargin = parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
+    window.scrollBy({
+      top: target.getBoundingClientRect().top - offsetTop - scrollMargin,
+      behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+    });
   }
 }
 

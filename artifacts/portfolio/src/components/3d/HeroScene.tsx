@@ -2,6 +2,7 @@ import React, { Suspense, useEffect, useRef, useState, Component } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Float, PerspectiveCamera, Environment } from '@react-three/drei';
 import * as THREE from 'three';
+import { useReducedMotion } from 'framer-motion';
 
 function RotatingShapes({ mousePosition }: { mousePosition: React.MutableRefObject<{ x: number; y: number }> }) {
   const group = useRef<THREE.Group>(null);
@@ -105,6 +106,7 @@ export function HeroScene() {
   // out of view — pauses the R3F render loop instead of rendering frames
   // nobody sees.
   const [isVisible, setIsVisible] = useState(true);
+  const reduce = useReducedMotion();
 
   const handlePointerMove = (e: React.PointerEvent) => {
     const x = (e.clientX / window.innerWidth) * 2 - 1;
@@ -129,7 +131,7 @@ export function HeroScene() {
     <WebGLErrorBoundary>
       <div ref={containerRef} className="absolute inset-0 z-0 bg-background" onPointerMove={handlePointerMove}>
         <Canvas
-          frameloop={isVisible ? 'always' : 'never'}
+          frameloop={!isVisible ? 'never' : reduce ? 'demand' : 'always'}
           onCreated={({ gl }) => {
             if (!gl || !gl.getContext()) {
               throw new Error('WebGL not available');

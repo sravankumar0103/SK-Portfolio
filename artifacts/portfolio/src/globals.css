@@ -770,3 +770,17 @@ section {
   transform: translateY(-4px);
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
 }
+
+/* Reduced motion: the OS setting collapses CSS animation and transition time
+   and turns off native smooth scrolling. Framer Motion, Lenis and the hero
+   canvas read the same preference in JS (App, SmoothScroll, HeroScene). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
