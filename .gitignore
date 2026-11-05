@@ -51,3 +51,5 @@ Thumbs.db
 .impeccable/
 # Watermelon UI MCP is added at local scope (~/.claude.json); this guards a project-scope add
 .mcp.json
+# superpowers subagent-driven-development workspace (per-run ledgers and briefs)
+/.superpowers/

@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "hello": "tsx ./src/hello.ts",
+    "check:reuse": "tsx ./src/check-reuse.ts",
+    "test": "tsx --test ./src/*.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
