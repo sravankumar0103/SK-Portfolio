@@ -7,6 +7,7 @@ import { Skills } from '@/components/sections/Skills';
 import { Projects } from '@/components/sections/Projects';
 import { Certifications } from '@/components/sections/Certifications';
 import { Contact } from '@/components/sections/Contact';
+import { reassert, scrollToY } from '@/lib/lenis';
 
 export default function Home() {
   // When arriving with a hash (e.g. returning from a project page via
@@ -23,15 +24,7 @@ export default function Home() {
       // Absolute document position — reliable regardless of transformed
       // ancestors (passing the element to Lenis uses offsetTop, which is off).
       const top = el.getBoundingClientRect().top + window.scrollY - 100;
-      const lenis = (window as any).__lenis;
-      if (lenis) {
-        // Lenis caches the scroll limit; refresh it first, otherwise the jump
-        // clamps to a stale (shorter) page height and stops short.
-        lenis.resize?.();
-        lenis.scrollTo(top, { immediate: true });
-      } else {
-        window.scrollTo({ top });
-      }
+      scrollToY(top, { immediate: true });
     };
 
     // The hero renders a 3D canvas and CMS content loads late, so the target's
@@ -44,7 +37,7 @@ export default function Home() {
     };
     const ro = new ResizeObserver(() => jump());
     ro.observe(document.body);
-    const timers = [40, 150, 320, 550, 850, 1300, 1900].map((t) => setTimeout(jump, t));
+    const cancelReassert = reassert(jump, [40, 150, 320, 550, 850, 1300, 1900]);
     const hardStop = window.setTimeout(stop, 2300);
     window.addEventListener('wheel', stop, { passive: true });
     window.addEventListener('touchstart', stop, { passive: true });
@@ -53,7 +46,7 @@ export default function Home() {
 
     function cleanup() {
       ro.disconnect();
-      timers.forEach(clearTimeout);
+      cancelReassert();
       clearTimeout(hardStop);
       window.removeEventListener('wheel', stop);
       window.removeEventListener('touchstart', stop);

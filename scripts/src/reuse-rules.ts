@@ -37,4 +37,24 @@ export const RULES: ReuseRule[] = [
     pattern: /--(color-)?(sidebar|chart)\b/,
     message: 'Sidebar and chart tokens have no consumer; do not add them back.',
   },
+  {
+    id: 'no-window-lenis',
+    audit: 'C5',
+    pattern: /__lenis/,
+    message: 'The Lenis instance lives in src/lib/lenis.ts; nothing may read or write window.__lenis.',
+  },
+  {
+    id: 'lenis-easing-once',
+    audit: 'C15',
+    pattern: /1\.001 - Math\.pow/,
+    allowIn: ['src/lib/lenis.ts'],
+    message: 'The Lenis easing curve is defined once, as scrollEasing in src/lib/lenis.ts; import it.',
+  },
+  {
+    id: 'native-scroll-in-lenis',
+    audit: 'C7',
+    pattern: /window\.scroll(To|By)\(/,
+    allowIn: ['src/lib/lenis.ts'],
+    message: 'Scroll through scrollToY or scrollToElement in src/lib/lenis.ts; they carry the native fallback.',
+  },
 ];

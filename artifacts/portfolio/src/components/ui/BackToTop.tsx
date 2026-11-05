@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUp } from 'lucide-react';
+import { scrollToY } from '@/lib/lenis';
 
 export function BackToTop() {
   const [isVisible, setIsVisible] = useState(false);
@@ -25,13 +26,6 @@ export function BackToTop() {
     };
   }, []);
 
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
-  };
-
   return (
     <AnimatePresence>
       {isVisible && (
@@ -39,7 +33,7 @@ export function BackToTop() {
           initial={{ opacity: 0, scale: 0.8, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.8, y: 20 }}
-          onClick={scrollToTop}
+          onClick={() => scrollToY(0)}
           className="fixed bottom-[38px] right-6 md:right-12 z-50 p-3 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-primary shadow-2xl hover:bg-primary hover:text-background transition-all duration-300 group"
           aria-label="Back to top"
         >

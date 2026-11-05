@@ -7,6 +7,7 @@ import * as z from 'zod';
 import { useToast } from "@/hooks/use-toast";
 import { ScrollRevealText } from '../ui/ScrollRevealText';
 import { useSanitySiteSettings } from '../../lib/sanityQueries';
+import { scrollToY } from '../../lib/lenis';
 
 // Fallback content — used if Sanity is empty, loading, or unreachable.
 const FALLBACK_EMAIL = 'sravankumar0103@gmail.com';
@@ -281,21 +282,7 @@ export function Contact() {
           </div>
 
           <motion.button
-            onClick={() => {
-              // Delegate to Lenis's own RAF loop (already running in
-              // SmoothScroll.tsx) instead of a separate hand-rolled one.
-              // Calling scrollTo again also naturally supersedes any
-              // in-flight Navbar scroll-to-section animation.
-              const lenis = (window as any).__lenis;
-              if (lenis) {
-                lenis.scrollTo(0, {
-                  duration: 1.2,
-                  easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-                });
-              } else {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }
-            }}
+            onClick={() => scrollToY(0)}
             className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-primary hover:text-background hover:bg-primary hover:border-primary transition-all duration-500 group shadow-lg"
             whileHover={{ y: -5, scale: 1.1 }}
             title="Back to top"

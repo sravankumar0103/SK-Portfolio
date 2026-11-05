@@ -5,6 +5,7 @@ import { Github, ExternalLink, ArrowUpRight, Sparkles } from 'lucide-react';
 import { useSanityProject, type SanityProjectDetail } from '../lib/sanityQueries';
 import { fallbackProjectDetails } from '../lib/projectsData';
 import { imageUrl } from '../lib/sanity';
+import { reassert, scrollToY } from '../lib/lenis';
 import { PortableBody } from '../components/ui/PortableBody';
 import { CoverflowGallery } from '../components/ui/CoverflowGallery';
 import NotFound from './not-found';
@@ -54,14 +55,9 @@ export default function ProjectDetail() {
     // Always open a project page at the very top. Lenis keeps its scroll
     // position across client-side navigations, so reset it (not just the
     // window) and re-assert briefly in case it re-syncs after layout.
-    const toTop = () => {
-      const lenis = (window as any).__lenis;
-      if (lenis) lenis.scrollTo(0, { immediate: true, force: true });
-      else window.scrollTo(0, 0);
-    };
+    const toTop = () => scrollToY(0, { immediate: true });
     toTop();
-    const timers = [0, 60, 160].map((t) => setTimeout(toTop, t));
-    return () => timers.forEach(clearTimeout);
+    return reassert(toTop, [0, 60, 160]);
   }, [slug]);
 
   useEffect(() => {
