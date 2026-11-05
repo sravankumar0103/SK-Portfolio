@@ -51,7 +51,6 @@ export default function ProjectDetail() {
   const backHref = slug ? `/#project-${slug}` : '/#projects';
 
   useEffect(() => {
-    document.documentElement.classList.add('dark');
     // Always open a project page at the very top. Lenis keeps its scroll
     // position across client-side navigations, so reset it (not just the
     // window) and re-assert briefly in case it re-syncs after layout.

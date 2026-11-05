@@ -589,8 +589,6 @@ html.lenis, html.lenis body {
   }
 }
 
-@custom-variant dark (&:is(.dark *));
-
 @theme inline {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
@@ -625,17 +623,6 @@ html.lenis, html.lenis body {
   --color-destructive: hsl(var(--destructive));
   --color-destructive-foreground: hsl(var(--destructive-foreground));
   --color-destructive-border: var(--destructive-border);
-
-  --color-sidebar: hsl(var(--sidebar));
-  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
-  --color-sidebar-border: hsl(var(--sidebar-border));
-  --color-sidebar-primary: hsl(var(--sidebar-primary));
-  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
-  --color-sidebar-primary-border: var(--sidebar-primary-border);
-  --color-sidebar-accent: hsl(var(--sidebar-accent));
-  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
-  --color-sidebar-accent-border: var(--sidebar-accent-border);
-  --color-sidebar-ring: hsl(var(--sidebar-ring));
 
   --font-sans: 'Plus Jakarta Sans', 'Inter', sans-serif;
   --font-outfit: 'Outfit', sans-serif;
@@ -687,68 +674,6 @@ html.lenis, html.lenis body {
   --ring: 11 81% 57%;
 
   --radius: 0.75rem;
-
-  --sidebar: 11 6% 7%;
-  --sidebar-foreground: 30 8% 92%;
-  --sidebar-border: 11 6% 14%;
-  --sidebar-primary: 11 81% 57%;
-  --sidebar-primary-foreground: 0 0% 3%;
-  --sidebar-accent: 0 0% 12%;
-  --sidebar-accent-foreground: 30 8% 92%;
-  --sidebar-ring: 11 81% 57%;
-
-  --chart-1: 11 81% 57%;
-  --chart-2: 0 0% 55%;
-  --chart-3: 0 0% 35%;
-  --chart-4: 30 30% 70%;
-  --chart-5: 0 0% 20%;
-}
-
-.dark {
-  --background: 11 6% 6%;
-  /* near-black obsidian */
-  --foreground: 30 8% 92%;
-  /* warm off-white */
-
-  --card: 11 6% 9%;
-  /* deep charcoal */
-  --card-foreground: 30 8% 92%;
-  --card-border: 11 6% 14%;
-
-  --popover: 11 6% 9%;
-  --popover-foreground: 30 8% 92%;
-  --popover-border: 11 6% 14%;
-
-  --primary: 11 81% 57%;
-  /* burnt orange */
-  --primary-foreground: 0 0% 3%;
-
-  --secondary: 0 0% 55%;
-  /* platinum / medium gray */
-  --secondary-foreground: 0 0% 95%;
-
-  --muted: 0 0% 12%;
-  --muted-foreground: 0 0% 48%;
-
-  --accent: 11 81% 57%;
-  /* burnt orange */
-  --accent-foreground: 0 0% 3%;
-
-  --destructive: 0 60% 50%;
-  --destructive-foreground: 0 0% 95%;
-
-  --border: 11 6% 14%;
-  --input: 11 6% 14%;
-  --ring: 11 81% 57%;
-
-  --sidebar: 11 6% 7%;
-  --sidebar-foreground: 30 8% 92%;
-  --sidebar-border: 11 6% 14%;
-  --sidebar-primary: 11 81% 57%;
-  --sidebar-primary-foreground: 0 0% 3%;
-  --sidebar-accent: 0 0% 12%;
-  --sidebar-accent-foreground: 30 8% 92%;
-  --sidebar-ring: 11 81% 57%;
 }
 
 @layer base {
@@ -826,30 +751,8 @@ section {
 }
 
 /* Glow effects */
-.glow-primary {
-  box-shadow: 0 0 20px hsla(11, 81%, 57%, 0.18);
-}
-
 .glow-hover:hover {
   box-shadow: 0 0 30px hsla(11, 81%, 57%, 0.28);
-}
-
-/* Micro-rule divider */
-.rule-divider {
-  width: 40px;
-  height: 1px;
-  background: hsla(11, 81%, 57%, 0.7);
-  margin: 0 auto;
-}
-
-/* Mask reveal utilities */
-.mask-up {
-  clip-path: inset(100% 0 0 0);
-  transition: clip-path 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.mask-up.active {
-  clip-path: inset(0 0 0 0);
 }
 
 /* Hover lift — subtle, not dramatic */
@@ -861,49 +764,4 @@ section {
 .hover-lift:hover {
   transform: translateY(-4px);
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
-}
-
-/* =============================================
-   Grey text reveal animation
-   Usage: add class="text-reveal" to any element.
-   Pair with JS IntersectionObserver or use the
-   global observer below (auto-applied).
-   ============================================= */
-.text-reveal {
-  color: hsl(11, 6%, 15%);
-  transition: color 0.9s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.text-reveal.revealed {
-  color: hsl(var(--foreground));
-}
-
-.text-reveal-muted {
-  color: hsl(11, 6%, 12%);
-  transition: color 0.9s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.text-reveal-muted.revealed {
-  color: hsl(var(--muted-foreground));
-}
-
-/* Reference image exact colors text reveal */
-.text-reveal-reference {
-  color: #2b2b2b;
-  transition: color 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.text-reveal-reference.revealed {
-  color: #b9b2a0;
-}
-
-/* Staggered word reveal variant */
-.text-reveal-word {
-  display: inline-block;
-  color: hsl(11, 6%, 15%);
-  transition: color 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.text-reveal-word.revealed {
-  color: hsl(var(--foreground));
 }

@@ -9,10 +9,6 @@ import { Certifications } from '@/components/sections/Certifications';
 import { Contact } from '@/components/sections/Contact';
 
 export default function Home() {
-  useEffect(() => {
-    document.documentElement.classList.add('dark');
-  }, []);
-
   // When arriving with a hash (e.g. returning from a project page via
   // "/#projects"), jump straight to that section instead of the top.
   useEffect(() => {
