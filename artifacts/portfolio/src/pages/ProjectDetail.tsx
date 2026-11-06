@@ -6,7 +6,7 @@ import { useSanityProject, orFallback, type SanityProjectDetail } from '../lib/s
 import { fallbackProjectDetails, codeUrl, liveUrl } from '../lib/projectsData';
 import { imageUrl } from '../lib/sanity';
 import { reassert, scrollToY } from '../lib/lenis';
-import { EASE_OUT_QUINT } from '../lib/motion';
+import { EASE_OUT_QUINT, fadeUpOnMount } from '../lib/motion';
 import { cn } from '../lib/utils';
 import { CONTAINER } from '../components/layout/Section';
 import { PageShell } from '../components/layout/PageShell';
@@ -122,9 +122,7 @@ export default function ProjectDetail() {
         <div className={cn(CONTAINER, 'relative max-w-7xl pt-16 md:pt-20 pb-6 md:pb-8')}>
           <div className="max-w-4xl">
             <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: EASE_OUT_QUINT, delay: 0.05 }}
+              {...fadeUpOnMount(0.05)}
               className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-semibold leading-[1.02] tracking-tight text-primary"
             >
               {project.title}
@@ -132,9 +130,7 @@ export default function ProjectDetail() {
 
             {project.overview && (
               <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: EASE_OUT_QUINT, delay: 0.15 }}
+                {...fadeUpOnMount(0.15)}
                 className="mt-7 text-base md:text-xl font-sans text-muted-foreground leading-relaxed max-w-3xl"
               >
                 {project.overview}
@@ -143,9 +139,7 @@ export default function ProjectDetail() {
 
             {showActions && (
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: EASE_OUT_QUINT, delay: 0.25 }}
+                {...fadeUpOnMount(0.25)}
                 className="mt-10 flex flex-wrap items-center gap-3"
               >
                 {codeHref && (

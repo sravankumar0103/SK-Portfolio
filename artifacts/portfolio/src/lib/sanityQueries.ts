@@ -15,10 +15,12 @@ import {
   fallbackSkills,
 } from './fallbackContent';
 
-const STALE_TIME = 1000 * 60; // 1 min — content is not time-critical
+// 1 min stale — content is not time-critical; one retry is enough.
+const QUERY_DEFAULTS = { staleTime: 1000 * 60, retry: 1 } as const;
 
 // `primary` when it has at least one item, else `fallback`. The one place the
-// "empty means fall back" rule is written; sections and resolveDetail import it.
+// "empty means fall back" rule is written; Contact, resolveDetail and
+// useSanityList use it.
 export function orFallback<T>(primary: T[] | null | undefined, fallback: T[]): T[];
 export function orFallback<T>(
   primary: T[] | null | undefined,
@@ -37,8 +39,7 @@ function useSanityList<T>(key: string, query: string, fallback: T[]): T[] {
   const { data } = useQuery({
     queryKey: ['sanity', key],
     queryFn: () => sanityFetch<T[]>(query),
-    staleTime: STALE_TIME,
-    retry: 1,
+    ...QUERY_DEFAULTS,
   });
   return orFallback(data, fallback);
 }
@@ -71,11 +72,9 @@ export interface SanityImage {
 }
 
 // An image member of `body`: the projection maps it to `{ _type, url, caption }`, no `children`.
-export interface SanityBodyImage {
+export interface SanityBodyImage extends SanityImage {
   _type: 'image';
   _key?: string;
-  url?: string;
-  caption?: string;
 }
 
 export interface SanityProjectDetail {
@@ -114,8 +113,7 @@ export function useSanityProject(slug: string | undefined) {
     queryKey: ['sanity', 'project', slug],
     queryFn: () => sanityFetch<SanityProjectDetail | null>(projectDetailQuery, { slug: slug! }),
     enabled: !!slug,
-    staleTime: STALE_TIME,
-    retry: 1,
+    ...QUERY_DEFAULTS,
   });
 }
 
@@ -201,7 +199,6 @@ export function useSanitySiteSettings() {
   return useQuery({
     queryKey: ['sanity', 'siteSettings'],
     queryFn: () => sanityFetch<SanitySiteSettings | null>(siteSettingsQuery),
-    staleTime: STALE_TIME,
-    retry: 1,
+    ...QUERY_DEFAULTS,
   });
 }

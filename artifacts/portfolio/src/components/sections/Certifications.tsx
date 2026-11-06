@@ -6,6 +6,8 @@ import { PillLink } from '../ui/PillLink';
 import { useSanityCertifications } from '../../lib/sanityQueries';
 import { slideInFromRight } from '../../lib/motion';
 
+const ROW_CLASS = 'flex flex-col md:flex-row md:items-center justify-between py-8 w-full';
+
 export function Certifications() {
   const certs = useSanityCertifications();
 
@@ -14,21 +16,9 @@ export function Certifications() {
       <SectionHeading num="05" title="Certifications" />
 
       <div className="mt-16 max-w-4xl">
-        {certs.map((cert, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
-            className="group border-b border-white/5 relative"
-          >
-            <a
-              href={cert.link || '#'}
-              target={cert.link ? "_blank" : undefined}
-              rel={cert.link ? "noopener noreferrer" : undefined}
-              className={`flex flex-col md:flex-row md:items-center justify-between py-8 w-full ${cert.link ? 'cursor-pointer' : 'cursor-default'}`}
-            >
+        {certs.map((cert, index) => {
+          const rowContent = (
+            <>
               <div className="absolute bottom-0 left-0 h-[1px] w-0 bg-primary group-hover:w-full transition-all duration-500 ease-out" />
 
               <div className="flex-1 pr-4">
@@ -49,9 +39,35 @@ export function Certifications() {
                   </motion.div>
                 </div>
               </div>
-            </a>
-          </motion.div>
-        ))}
+            </>
+          );
+
+          return (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              className="group border-b border-white/5 relative"
+            >
+              {cert.link ? (
+                <a
+                  href={cert.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`${ROW_CLASS} cursor-pointer`}
+                >
+                  {rowContent}
+                </a>
+              ) : (
+                <div className={`${ROW_CLASS} cursor-default`}>
+                  {rowContent}
+                </div>
+              )}
+            </motion.div>
+          );
+        })}
       </div>
     </Section>
   );

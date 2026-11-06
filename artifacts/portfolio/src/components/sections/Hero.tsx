@@ -6,6 +6,7 @@ import { CONTAINER } from '../layout/Section';
 import { Magnetic } from '../ui/Magnetic';
 import { useSanitySiteSettings } from '../../lib/sanityQueries';
 import { EASE_OUT_EXPO } from '../../lib/motion';
+import { scrollToElement } from '../../lib/lenis';
 import { cn } from '@/lib/utils';
 
 // Fallback content — used if Sanity is empty, loading, or unreachable.
@@ -81,7 +82,8 @@ export function Hero() {
                   href="#about"
                   onClick={(e) => {
                     e.preventDefault();
-                    document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+                    const about = document.getElementById('about');
+                    if (about) scrollToElement(about, 0);
                   }}
                   className="bg-primary text-background px-[clamp(20px,4vw,32px)] py-[clamp(12px,2vw,16px)] rounded-full font-sans text-sm uppercase tracking-widest hover:bg-white transition-colors flex items-center gap-2 group"
                 >
@@ -122,7 +124,7 @@ export function Hero() {
             }}
             transition={{
               duration: 2,
-              repeat: Infinity,
+              repeat: 1,
               ease: "easeInOut"
             }}
             className="w-0.5 h-1 bg-primary/60 rounded-full"

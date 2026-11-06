@@ -28,7 +28,7 @@ export const RULES: ReuseRule[] = [
   {
     id: 'no-dark-class',
     audit: 'C12',
-    pattern: /classList\.add\('dark'\)|^\.dark \{|@custom-variant dark/,
+    pattern: /classList\.add\(['"]dark['"]\)|^\.dark \{|@custom-variant dark/,
     message: 'The site has a single dark theme in :root; there is no .dark variant.',
   },
   {
@@ -53,7 +53,7 @@ export const RULES: ReuseRule[] = [
   {
     id: 'native-scroll-in-lenis',
     audit: 'C7',
-    pattern: /window\.scroll(To|By)\(/,
+    pattern: /window\.scroll(To|By)\(|scrollIntoView\(/,
     allowIn: ['src/lib/lenis.ts'],
     message: 'Scroll through scrollToY or scrollToElement in src/lib/lenis.ts; they carry the native fallback.',
   },
@@ -87,7 +87,7 @@ export const RULES: ReuseRule[] = [
   {
     id: 'primary-literal',
     audit: 'C16',
-    pattern: /hsla?\(11,\s*81%,\s*57%/,
+    pattern: /hsla?\(11(?:,\s*|\s+)81%(?:,\s*|\s+)57%/,
     allowIn: ['src/components/ui/ScrollRevealText.tsx'],
     message: 'Use the primary token: hsl(var(--primary) / <alpha>) in CSS and arbitrary values. Only ScrollRevealText\'s TONES map keeps the literal, because framer-motion cannot interpolate var().',
   },
@@ -125,5 +125,23 @@ export const RULES: ReuseRule[] = [
     pattern: /hexapod-robotic-arm|!==\s*'#'/,
     allowIn: ['src/lib/projectsData.ts'],
     message: 'Use codeUrl(project, slug) and liveUrl(project) from src/lib/projectsData.ts; they hold the "no code link" and "no live link" rules.',
+  },
+  {
+    id: 'no-fake-href',
+    audit: 'C20',
+    pattern: /\|\|\s*['"]#['"]/,
+    message: 'An <a> with no destination is a div: choose the tag before rendering instead of falling back to href="#".',
+  },
+  {
+    id: 'no-nbsp-split',
+    audit: 'C22',
+    pattern: /\\u00A0/,
+    message: 'A non-breaking space stops a title wrapping on a phone; render the plain character.',
+  },
+  {
+    id: 'no-infinite-loop',
+    audit: 'C23',
+    pattern: /repeat:\s*Infinity/,
+    message: 'WCAG 2.2.2: motion that starts automatically must stop within 5 seconds; use a finite repeat count.',
   },
 ];

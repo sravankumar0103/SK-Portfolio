@@ -1,10 +1,10 @@
-import { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Section } from '../layout/Section';
 import { SectionHeading } from '../ui/SectionHeading';
 import { ScrollRevealText } from '../ui/ScrollRevealText';
 import { useSanityExperience, type SanityExperience } from '../../lib/sanityQueries';
-import { VIEWPORT_CENTER_MARGIN, rowEnter, expandOnView } from '../../lib/motion';
+import { rowEnter, expandOnView } from '../../lib/motion';
+import { useRowInView } from '../../hooks/use-row-in-view';
 
 export function Experience() {
   const experiences = useSanityExperience();
@@ -29,8 +29,7 @@ export function Experience() {
 
 function ExperienceItem({ data, index }: { data: SanityExperience, index: number }) {
   const isEven = index % 2 === 0;
-  const ref = useRef(null);
-  const isInView = useInView(ref, { margin: VIEWPORT_CENTER_MARGIN });
+  const { ref, isInView } = useRowInView();
 
   return (
     <motion.div

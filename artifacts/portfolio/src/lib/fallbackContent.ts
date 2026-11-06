@@ -1,8 +1,9 @@
 // ---------------------------------------------------------------------------
 // Fallback content for the small Sanity-backed sections — used when Sanity is
-// empty, loading, or unreachable. The hooks in sanityQueries.ts apply these, so
-// a component never writes its own `data ?? fallback`. Project fallbacks live
-// next to their (much larger) write-ups in projectsData.ts.
+// empty, loading, or unreachable. The list hooks in sanityQueries.ts apply the
+// three arrays, so a section never writes its own `data ?? fallback`; Contact
+// applies FALLBACK_EMAIL and fallbackSocials to the site settings. Project
+// fallbacks live next to their (much larger) write-ups in projectsData.ts.
 //
 // Each array is typed with its Sanity interface, so a fallback that drifts from
 // the shape the CMS returns is a typecheck failure.

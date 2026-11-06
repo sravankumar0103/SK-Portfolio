@@ -48,7 +48,7 @@ export function ScrollRevealText({
               }}
               className={characterClassName}
             >
-              {char === " " ? "\u00A0" : char}
+              {char}
             </motion.span>
           );
         }

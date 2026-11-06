@@ -10,21 +10,14 @@ import type { PortableTextBlock } from '@portabletext/react';
 import type { SanityProject, SanityProjectDetail } from './sanityQueries';
 
 // --- Tiny Portable Text builders so fallback bodies share the CMS render path.
-const p = (text: string): PortableTextBlock => ({
+const block = (style: 'normal' | 'h2' | 'h3', text: string): PortableTextBlock => ({
   _type: 'block',
-  style: 'normal',
+  style,
   children: [{ _type: 'span', text }],
 });
-const h2 = (text: string): PortableTextBlock => ({
-  _type: 'block',
-  style: 'h2',
-  children: [{ _type: 'span', text }],
-});
-const h3 = (text: string): PortableTextBlock => ({
-  _type: 'block',
-  style: 'h3',
-  children: [{ _type: 'span', text }],
-});
+const p = (text: string) => block('normal', text);
+const h2 = (text: string) => block('h2', text);
+const h3 = (text: string) => block('h3', text);
 const bullets = (items: string[]): PortableTextBlock[] =>
   items.map((text) => ({
     _type: 'block',

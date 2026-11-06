@@ -1,5 +1,4 @@
-import { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Link } from 'wouter';
 import { Section } from '../layout/Section';
 import { SectionHeading } from '../ui/SectionHeading';
@@ -8,7 +7,8 @@ import { PillLink } from '../ui/PillLink';
 import { ArrowRight, Github, ExternalLink } from 'lucide-react';
 import { useSanityProjects, type SanityProject } from '../../lib/sanityQueries';
 import { detailSlugByTitle, codeUrl, liveUrl } from '../../lib/projectsData';
-import { VIEWPORT_CENTER_MARGIN, rowEnter, expandOnView, slideInFromRight } from '../../lib/motion';
+import { rowEnter, expandOnView, slideInFromRight } from '../../lib/motion';
+import { useRowInView } from '../../hooks/use-row-in-view';
 
 export function Projects() {
   const projects = useSanityProjects();
@@ -28,8 +28,7 @@ export function Projects() {
 
 function ProjectRow({ project, index }: { project: SanityProject, index: number }) {
   const num = (index + 1).toString().padStart(2, '0');
-  const ref = useRef(null);
-  const isInView = useInView(ref, { margin: VIEWPORT_CENTER_MARGIN });
+  const { ref, isInView } = useRowInView();
   // Resolve the detail-page link. Every project that has a slug — either from
   // Sanity or matched by title to a bundled write-up — gets a working page.
   // The Sanity "Enable detail page" toggle only decides whether the page shows
@@ -40,6 +39,14 @@ function ProjectRow({ project, index }: { project: SanityProject, index: number 
   const detailHref = slug ? `/projects/${slug}` : null;
   const code = codeUrl(project, slug);
   const live = liveUrl(project);
+  const title = (
+    <ScrollRevealText
+      text={project.title}
+      isActive={isInView}
+      tone="primary"
+      characterClassName="group-hover:!text-foreground"
+    />
+  );
 
   return (
     <motion.div
@@ -63,20 +70,10 @@ function ProjectRow({ project, index }: { project: SanityProject, index: number 
             <h3 className="text-2xl sm:text-3xl md:text-5xl font-display font-medium transition-all duration-500 group-hover:tracking-tight">
               {detailHref ? (
                 <Link href={detailHref} className="cursor-pointer">
-                  <ScrollRevealText
-                    text={project.title}
-                    isActive={isInView}
-                    tone="primary"
-                    characterClassName="group-hover:!text-foreground"
-                  />
+                  {title}
                 </Link>
               ) : (
-                <ScrollRevealText
-                  text={project.title}
-                  isActive={isInView}
-                  tone="primary"
-                  characterClassName="group-hover:!text-foreground"
-                />
+                title
               )}
             </h3>
 

@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { listFiles, scan } from './check-reuse.js';
+import { RULES } from './reuse-rules.js';
 import type { ReuseRule } from './reuse-rules.js';
 
 let root: string;
@@ -61,6 +62,16 @@ test('returns an empty list for a clean tree', () => {
   plant('src/a.ts', 'const a = 1;\r\nconst b = 2;\r\n');
   assert.deepEqual(scan(root, [rule()]), []);
   assert.deepEqual(listFiles(root), ['src/a.ts']);
+});
+
+test('no-dark-class catches a double-quoted classList.add("dark")', () => {
+  plant('src/a.ts', 'document.documentElement.classList.add("dark");');
+  assert.deepEqual(scan(root, RULES).map((v) => v.rule), ['no-dark-class']);
+});
+
+test('primary-literal catches the CSS space syntax hsl(11 81% 57%)', () => {
+  plant('src/a.css', 'color: hsl(11 81% 57%);');
+  assert.deepEqual(scan(root, RULES).map((v) => v.rule), ['primary-literal']);
 });
 
 test('exits 2 when the root has no scannable files', () => {

@@ -31,6 +31,15 @@ export const expandOnView = {
   },
 } satisfies MotionProps;
 
+/** A hero element rising 20px into place on mount (ProjectDetail). */
+export function fadeUpOnMount(delay: number): MotionProps {
+  return {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.8, ease: EASE_OUT_QUINT, delay },
+  };
+}
+
 /** A chip sliding in from the right as it reaches the centre (Certifications, Projects). */
 export function slideInFromRight(delay: number): MotionProps {
   return {
