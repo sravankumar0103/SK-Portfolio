@@ -46,7 +46,7 @@ Currently three families loaded (Plus Jakarta Sans, Outfit, Inter) — that's on
 - Add `text-wrap: balance` on all headings, `text-wrap: pretty` on paragraphs. Both are Baseline-safe, degrade harmlessly.
 - Use `tabular-nums` on all metrics/counters.
 
-### Motion language (standardize — currently inconsistent across components)
+### Motion language (standardize — now centralised in `src/lib/motion.ts`; change the values there)
 | Use | Duration | Easing |
 |---|---|---|
 | Hover / micro | 150–250ms | `cubic-bezier(0.22, 1, 0.36, 1)` |
@@ -61,7 +61,7 @@ A fixed, full-viewport noise layer at `opacity: 0.04`, `pointer-events: none`. I
 **Implementation:** tiled 128px noise PNG (a few KB) — *not* SVG `feTurbulence` (rasterizes at full viewport size, slow, flaky in Safari) and *not* canvas. Use plain `opacity`, **never `mix-blend-mode` over the WebGL canvas** (forces expensive compositing).
 
 ### Spacing
-Section padding → `clamp(96px, 12vw, 180px)`. Current `py-12 md:py-20` (48/80px) is too tight for a premium feel — generous whitespace is most of what reads as "expensive".
+Section padding → `clamp(96px, 12vw, 180px)` — change it in one place, `src/components/layout/Section.tsx`. Current `py-12 md:py-20` (48/80px) is too tight for a premium feel — generous whitespace is most of what reads as "expensive".
 
 ---
 

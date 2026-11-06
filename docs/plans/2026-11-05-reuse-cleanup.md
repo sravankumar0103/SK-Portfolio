@@ -1,6 +1,6 @@
 # Reuse cleanup Implementation Plan
 
-**Status:** Written 5 Nov 2026; reviewed against the code and corrected 6 Nov 2026; Impeccable audit and Chrome DevTools smoke test folded in 6 Nov 2026; restructured to the anthill plan standard 6 Nov 2026. Every owner decision is answered. **Not started** — nothing in this plan is implemented. Branch `reuse-cleanup` exists locally, cut from `main` at `cb14209`.
+**Status:** Executed 6 Nov 2026 on reuse-cleanup (10 commits, HEAD 9425b85); docs updated, unstaged for the owner.
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 >
@@ -360,7 +360,7 @@ Earlier tasks can change a later task's baseline (the table notes where). The im
   - Scan set: `src/**/*.{ts,tsx,css}` plus `components.json` and `index.html` at the root. It skips `node_modules` and `dist`. `file` is root-relative with `/` separators. `allowIn` is exact path equality. A line gets one violation per rule however many times it matches. Lines are 1-based.
   - Commands: `pnpm run check:reuse` (root) → `pnpm --filter @workspace/scripts run check:reuse`; `pnpm --filter @workspace/scripts run test` → `tsx --test ./src/*.test.ts`.
 
-- [ ] **Step 1: Write the failing tests** in `check-reuse.test.ts` (`node:test`, `node:assert/strict`, a temp tree from `fs.mkdtempSync(path.join(os.tmpdir(), 'reuse-'))`):
+- [x] **Step 1: Write the failing tests** in `check-reuse.test.ts` (`node:test`, `node:assert/strict`, a temp tree from `fs.mkdtempSync(path.join(os.tmpdir(), 'reuse-'))`):
   - `reports a matching line with its root-relative path and 1-based line` → `src/a.tsx` containing `ok\nwindow.__lenis = x` gives `[{ rule: 't', file: 'src/a.tsx', line: 2, text: 'window.__lenis = x' }]` for a rule `/__lenis/`
   - `ignores a match in an allowIn file` → the same content in `src/lib/lenis.ts` with `allowIn: ['src/lib/lenis.ts']` gives `[]`
   - `scans components.json and index.html but not node_modules or dist` → matches planted in `components.json` and `index.html` are reported; the same planted in `src/node_modules/x/a.ts` and `src/dist/a.ts` are not. Plant them **inside** `src/`: at the tree root those two paths are outside the scan set anyway, so the test would pass without the skip logic existing
@@ -368,10 +368,10 @@ Earlier tasks can change a later task's baseline (the table notes where). The im
   - `reports one violation per rule per line` → a line with two matches gives one violation
   - `returns an empty list for a clean tree`
   - `exits 2 when the root has no scannable files` → `scan` on an empty temp dir, asserting the CLI's guard condition (zero files scanned) rather than returning `[]` silently
-- [ ] **Step 2: Run, expect FAIL** (module missing): `pnpm --filter @workspace/scripts run test`
-- [ ] **Step 3: Implement** `scan` and `format` with `fs.readdirSync(…, { withFileTypes: true })` recursion and `split(/\r?\n/)` (the repo has CRLF working copies). Use only Node built-ins. Add `"check:reuse": "tsx ./src/check-reuse.ts"` and `"test": "tsx --test ./src/*.test.ts"` to `scripts/package.json` and remove `"hello"`. Add `"check:reuse": "pnpm --filter @workspace/scripts run check:reuse"` to the root `package.json`. Add a CI step after "Typecheck": `- name: Reuse guard` / `run: pnpm run check:reuse && pnpm --filter @workspace/scripts run test`.
-- [ ] **Step 4: Run, expect PASS:** `pnpm --filter @workspace/scripts run test` (7 pass), `pnpm run check:reuse` (exit 0, "0 violations", since `RULES` is empty), then the gate.
-- [ ] **Step 5: Commit** `Add a reuse guard for duplicated literals` (the three new files, the deleted `hello.ts`, both `package.json` files, `ci.yml`, **plus the run's own setup files** (D2): this plan, `.gitignore` (its `/.superpowers/` line), `.claude/commands/run-plan.md` and the four `.claude/agents/portfolio-*.md` files).
+- [x] **Step 2: Run, expect FAIL** (module missing): `pnpm --filter @workspace/scripts run test`
+- [x] **Step 3: Implement** `scan` and `format` with `fs.readdirSync(…, { withFileTypes: true })` recursion and `split(/\r?\n/)` (the repo has CRLF working copies). Use only Node built-ins. Add `"check:reuse": "tsx ./src/check-reuse.ts"` and `"test": "tsx --test ./src/*.test.ts"` to `scripts/package.json` and remove `"hello"`. Add `"check:reuse": "pnpm --filter @workspace/scripts run check:reuse"` to the root `package.json`. Add a CI step after "Typecheck": `- name: Reuse guard` / `run: pnpm run check:reuse && pnpm --filter @workspace/scripts run test`.
+- [x] **Step 4: Run, expect PASS:** `pnpm --filter @workspace/scripts run test` (7 pass), `pnpm run check:reuse` (exit 0, "0 violations", since `RULES` is empty), then the gate.
+- [x] **Step 5: Commit** `Add a reuse guard for duplicated literals` (the three new files, the deleted `hello.ts`, both `package.json` files, `ci.yml`, **plus the run's own setup files** (D2): this plan, `.gitignore` (its `/.superpowers/` line), `.claude/commands/run-plan.md` and the four `.claude/agents/portfolio-*.md` files).
 
 ---
 
@@ -385,16 +385,16 @@ Earlier tasks can change a later task's baseline (the table notes where). The im
 - Consumes: Task 1's `RULES`.
 - Produces: none. After this task `globals.css` holds no class or token that no component reads, except the inlined `tw-animate-css` block, which is kept on purpose.
 
-- [ ] **Step 1: Add the five Task 2 rules** from the [rule table](#guard-rule-table), each with `audit` set (`C8`, `C9`, `C10`, `C12`, `C12`).
-- [ ] **Step 2: Run, expect FAIL:** `pnpm run check:reuse` reports **78** violations: `no-text-reveal` 10, `no-dead-css-classes` 4, `no-index-css` 1, `no-dark-class` 6, `no-dead-tokens` 57. They span `globals.css`, `index.css`, `main.tsx`, `components.json`, `Home.tsx` and `ProjectDetail.tsx`.
-- [ ] **Step 3: Delete** everything listed under Files. Before deleting a `globals.css` rule, grep its class or token name across `src` and confirm it has 0 uses. Leave `gold-text`, `hover-lift`, `premium-card`, `premium-card-hover`, `glow-hover`, `premium-gradient-text` and `lenis` (all live).
-- [ ] **Step 4: Run** `pnpm install --frozen-lockfile` (proves the workspace edit changed no resolution), then the gate. Expect PASS, JS no larger than baseline + 0.5 kB — it should drop, since the observer and the Radix tooltip provider go — and CSS below `75.37 kB`. Confirm `grep -rn "tooltip" artifacts/portfolio/src` prints nothing. Run `npx impeccable detect artifacts/portfolio/src`: expect 4 findings, down from 5, because the Space Grotesk import in `index.css` is gone.
-- [ ] **Step 5: Browser check** (Opus, browser only — see [Browser checks](#browser-checks-agent-run)). Into `task-2/`:
+- [x] **Step 1: Add the five Task 2 rules** from the [rule table](#guard-rule-table), each with `audit` set (`C8`, `C9`, `C10`, `C12`, `C12`).
+- [x] **Step 2: Run, expect FAIL:** `pnpm run check:reuse` reports **78** violations: `no-text-reveal` 10, `no-dead-css-classes` 4, `no-index-css` 1, `no-dark-class` 6, `no-dead-tokens` 57. They span `globals.css`, `index.css`, `main.tsx`, `components.json`, `Home.tsx` and `ProjectDetail.tsx`.
+- [x] **Step 3: Delete** everything listed under Files. Before deleting a `globals.css` rule, grep its class or token name across `src` and confirm it has 0 uses. Leave `gold-text`, `hover-lift`, `premium-card`, `premium-card-hover`, `glow-hover`, `premium-gradient-text` and `lenis` (all live).
+- [x] **Step 4: Run** `pnpm install --frozen-lockfile` (proves the workspace edit changed no resolution), then the gate. Expect PASS, JS no larger than baseline + 0.5 kB — it should drop, since the observer and the Radix tooltip provider go — and CSS below `75.37 kB`. Confirm `grep -rn "tooltip" artifacts/portfolio/src` prints nothing. Run `npx impeccable detect artifacts/portfolio/src`: expect 4 findings, down from 5, because the Space Grotesk import in `index.css` is gone.
+- [x] **Step 5: Browser check** (Opus, browser only — see [Browser checks](#browser-checks-agent-run)). Into `task-2/`:
   1. Every baseline screenshot, retaken at desktop and phone, matches.
   2. Every padding and container width in `metrics.json` matches exactly (0 px).
   3. The toast still animates in — it is what the kept `tw-animate-css` block exists for. Stub the clipboard with an `initScript` (`navigator.clipboard.writeText = async () => {}`), click the copy-email control, and confirm the toast appears and its element's computed `animation-name` is not `none`.
   4. No new console errors.
-- [ ] **Step 6: Commit** `Remove dead CSS, the reveal observer and index.css`.
+- [x] **Step 6: Commit** `Remove dead CSS, the reveal observer and index.css`.
 
 ---
 
@@ -405,10 +405,10 @@ Earlier tasks can change a later task's baseline (the table notes where). The im
 
 **Interfaces:** none.
 
-- [ ] **Step 1: Prove each is unused** (this is the failing-test equivalent; it must print nothing): `grep -rnE "from ['\"](date-fns|next-themes|react-icons|@radix-ui/react-tooltip)" artifacts/portfolio/src artifacts/portfolio/vite.config.ts`. If anything prints, stop and report. (`@radix-ui/react-tooltip` is unused only after Task 2 deletes `tooltip.tsx`.)
-- [ ] **Step 2: Remove** with `pnpm --filter portfolio remove date-fns next-themes react-icons @radix-ui/react-tooltip`. **Leave `gsap` and `@gsap/react` installed** — the owner is keeping them for `DESIGN_UPGRADE.md` §6 (D3).
-- [ ] **Step 3: Run the gate.** Expect JS and CSS byte-identical to Task 2's numbers (nothing imported them).
-- [ ] **Step 4: Commit** `Remove unused dependencies` (the portfolio `package.json` and `pnpm-lock.yaml` only).
+- [x] **Step 1: Prove each is unused** (this is the failing-test equivalent; it must print nothing): `grep -rnE "from ['\"](date-fns|next-themes|react-icons|@radix-ui/react-tooltip)" artifacts/portfolio/src artifacts/portfolio/vite.config.ts`. If anything prints, stop and report. (`@radix-ui/react-tooltip` is unused only after Task 2 deletes `tooltip.tsx`.)
+- [x] **Step 2: Remove** with `pnpm --filter portfolio remove date-fns next-themes react-icons @radix-ui/react-tooltip`. **Leave `gsap` and `@gsap/react` installed** — the owner is keeping them for `DESIGN_UPGRADE.md` §6 (D3).
+- [x] **Step 3: Run the gate.** Expect JS and CSS byte-identical to Task 2's numbers (nothing imported them).
+- [x] **Step 4: Commit** `Remove unused dependencies` (the portfolio `package.json` and `pnpm-lock.yaml` only).
 
 ---
 
@@ -428,25 +428,25 @@ Earlier tasks can change a later task's baseline (the table notes where). The im
   - `export function scrollToElement(target: HTMLElement, offsetTop: number): void`. With Lenis: `lenis.scrollTo(target, { offset: -offsetTop, duration: SCROLL_DURATION, easing: scrollEasing })`. Without: `window.scrollBy({ top: target.getBoundingClientRect().top - offsetTop, behavior: 'smooth' })`.
   - `export function reassert(fn: () => void, delaysMs: readonly number[]): () => void` schedules `fn` at each delay and returns a cancel that clears them all.
 
-- [ ] **Step 1: Add** `no-window-lenis`, `lenis-easing-once` and `native-scroll-in-lenis` (audit `C5`, `C15`, `C7`).
-- [ ] **Step 2: Run, expect FAIL** with 14 violations (6 + 3 + 5).
-- [ ] **Step 3: Write `src/lib/lenis.ts`.** If `resize` is not on the `Lenis` type in `node_modules/lenis/dist/lenis.d.ts`, keep `lenis.resize?.()` and say so. Never cast.
-- [ ] **Step 4: Rewire the call sites.**
+- [x] **Step 1: Add** `no-window-lenis`, `lenis-easing-once` and `native-scroll-in-lenis` (audit `C5`, `C15`, `C7`).
+- [x] **Step 2: Run, expect FAIL** with 14 violations (6 + 3 + 5).
+- [x] **Step 3: Write `src/lib/lenis.ts`.** If `resize` is not on the `Lenis` type in `node_modules/lenis/dist/lenis.d.ts`, keep `lenis.resize?.()` and say so. Never cast.
+- [x] **Step 4: Rewire the call sites.**
   - `SmoothScroll` builds Lenis with `duration: SCROLL_DURATION, easing: scrollEasing`, calls `setLenis(lenis)`, and on cleanup calls `setLenis(null)` and `lenis.destroy()`. **Also keep the id returned by `requestAnimationFrame` and `cancelAnimationFrame` it in that cleanup** (`SmoothScroll.tsx:32-37` never does today). The effect's `[]` makes that harmless now, but Task 9 gives it a dependency, and an un-cancelled loop would then run beside the new one — the second RAF loop CLAUDE.md forbids. In dev it already double-fires under StrictMode.
   - `Navbar` calls `scrollToElement(target, SCROLL_MARGIN_TOP)`.
   - `Contact` and `BackToTop` call `scrollToY(0)`.
   - `Home.jump` calls `scrollToY(top, { immediate: true })` and uses `reassert(jump, [40, 150, 320, 550, 850, 1300, 1900])` in place of its `timers` array. Keep its `ResizeObserver`, the stop listeners and the 2300 ms hard stop.
   - `ProjectDetail` calls `toTop()` once, then `reassert(toTop, [0, 60, 160])`, where `toTop = () => scrollToY(0, { immediate: true })`.
   - Delete the moved comments, and keep one line in `lenis.ts` explaining why callers must not run their own RAF.
-- [ ] **Step 5: Run the gate, expect PASS.** `grep -rn "__lenis" artifacts/portfolio/src` prints nothing.
-- [ ] **Step 6: Browser check** (the Opus reviewer, with the code review). Into `task-4/`, at desktop:
+- [x] **Step 5: Run the gate, expect PASS.** `grep -rn "__lenis" artifacts/portfolio/src` prints nothing.
+- [x] **Step 6: Browser check** (the Opus reviewer, with the code review). Into `task-4/`, at desktop:
   1. **Nav links:** for each, `scrollY` 2500 ms after the click is within ±2 px of the baseline.
   2. **Project opens at the top:** scroll to the bottom of Home, click a project link; 500 ms after the route changes, `scrollY` is `0`.
   3. **Hash return (Review Focus 1):** under `emulate { cpuThrottlingRate: 4, networkConditions: "Fast 4G" }`, open `/projects/arogyalens` and click "See more projects". 2500 ms later the `#project-arogyalens` row's top is within ±20 px of the baseline. Clear the emulation afterwards.
   4. **Back-to-top:** from the bottom of Home, click Contact's arrow. At 300 ms `scrollY` is strictly between its start and `0` (it glides rather than jumps); at 2500 ms it is `0`.
   5. **Scroll feel, by proxy:** `<html>` has the `lenis` class; idle `requestAnimationFrame` calls per second are within baseline + 5%; `SCROLL_DURATION` is `1.2` and `scrollEasing` is today's curve.
   6. No new console errors.
-- [ ] **Step 7: Commit** `Move Lenis access into one module`.
+- [x] **Step 7: Commit** `Move Lenis access into one module`.
 
 **Reviewer looks hardest at:** decision 5 (resize plus force on both immediate paths); that `Home`'s cleanup still cancels everything `reassert` scheduled; that `SmoothScroll` remains the only RAF loop.
 
@@ -461,11 +461,11 @@ Earlier tasks can change a later task's baseline (the table notes where). The im
 - Consumes: `SanityExperience`, `SanityProject` (existing, `sanityQueries.ts`); `import type { PortableTextBlock } from '@portabletext/react'`. Import only from `@portabletext/react`. `@portabletext/types` is not declared, and importing it is the phantom-dependency bug CLAUDE.md forbids. Also `import type { MotionValue } from 'framer-motion'`.
 - Produces: `ExperienceItem({ data, index }: { data: SanityExperience; index: number })`; `ProjectRow({ project, index }: { project: SanityProject; index: number })`; `export interface SanityBodyImage { _type: 'image'; _key?: string; url?: string; caption?: string }` in `sanityQueries.ts`, because the GROQ projection (`sanityQueries.ts:66-69`) returns image members as `{ _type: 'image', url, caption }` with no `children` — `PortableTextBlock[]` alone mistypes them, and `tsc` cannot catch it because `sanityFetch<T>` is unchecked; `SanityProjectDetail.body?: Array<PortableTextBlock | SanityBodyImage>`; `PortableBody({ value }: { value: NonNullable<SanityProjectDetail['body']> })` (PortableText's generic accepts the union, and `PortableBody.tsx:72-91` already renders those image members); the builders return `PortableTextBlock` (or `PortableTextBlock[]` for `bullets`).
 
-- [ ] **Step 1: Add** `no-any` (audit `C6`).
-- [ ] **Step 2: Run, expect FAIL** with 5 violations (11 at baseline, minus the 6 `__lenis` casts Task 4 removed).
-- [ ] **Step 3: Replace each `any`** with the type above. Fix what `tsc` reports in the builders by annotating return types, not by casting (`_type: 'block'` widens to `string` without the annotation). Drop `(t: string)` in `ProjectRow`'s `tech.map`, since it is now inferred.
-- [ ] **Step 4: Run the gate, expect PASS.** Expect JS byte-identical (types only).
-- [ ] **Step 5: Commit** `Type section props and Portable Text bodies`.
+- [x] **Step 1: Add** `no-any` (audit `C6`).
+- [x] **Step 2: Run, expect FAIL** with 5 violations (11 at baseline, minus the 6 `__lenis` casts Task 4 removed).
+- [x] **Step 3: Replace each `any`** with the type above. Fix what `tsc` reports in the builders by annotating return types, not by casting (`_type: 'block'` widens to `string` without the annotation). Drop `(t: string)` in `ProjectRow`'s `tech.map`, since it is now inferred.
+- [x] **Step 4: Run the gate, expect PASS.** Expect JS byte-identical (types only).
+- [x] **Step 5: Commit** `Type section props and Portable Text bodies`.
 
 ---
 
@@ -482,20 +482,20 @@ Earlier tasks can change a later task's baseline (the table notes where). The im
   - `useSanityProjects(): SanityProject[]`, `useSanityExperience(): SanityExperience[]`, `useSanitySkills(): SanitySkillGroup[]`, `useSanityCertifications(): SanityCertification[]`, each through a private `useSanityList<T>(key: string, query: string, fallback: T[]): T[]` that keeps today's `queryKey`, `staleTime` and `retry: 1`.
   - `useSanityProject` and `useSanitySiteSettings` are unchanged (single documents, read field by field).
 
-- [ ] **Step 1: Add** `fallback-in-hooks` (audit `C2`).
-- [ ] **Step 2: Run, expect FAIL** with 7 violations: 5 sections, plus 2 in `ProjectDetail.resolveDetail`.
-- [ ] **Step 3: Implement** `orFallback`, `useSanityList` and the four hooks. Move the fallback arrays to `fallbackContent.ts` and **annotate** each one (`const fallbackSkills: SanitySkillGroup[] = [...]`, and so on). They are untyped literals today (`Experience.tsx:8`, `Certifications.tsx:7`, `Contact.tsx:13`), so there is no existing type to carry over — annotating is what makes a fallback that drifts from its Sanity interface a typecheck failure.
-- [ ] **Step 4: Update the call sites.**
+- [x] **Step 1: Add** `fallback-in-hooks` (audit `C2`).
+- [x] **Step 2: Run, expect FAIL** with 7 violations: 5 sections, plus 2 in `ProjectDetail.resolveDetail`.
+- [x] **Step 3: Implement** `orFallback`, `useSanityList` and the four hooks. Move the fallback arrays to `fallbackContent.ts` and **annotate** each one (`const fallbackSkills: SanitySkillGroup[] = [...]`, and so on). They are untyped literals today (`Experience.tsx:8`, `Certifications.tsx:7`, `Contact.tsx:13`), so there is no existing type to carry over — annotating is what makes a fallback that drifts from its Sanity interface a typecheck failure.
+- [x] **Step 4: Update the call sites.**
   - Sections become `const skills = useSanitySkills();` (no destructuring).
   - `Contact` uses `orFallback(settings?.socials, fallbackSocials)` and `settings?.contactEmail || FALLBACK_EMAIL`.
   - In `resolveDetail`, gallery becomes `orFallback(sanity.gallery, fallback.gallery)` and tech becomes `orFallback(fallback.tech, sanity.tech)`. The argument order is deliberately reversed, because the bundled write-up's tech list wins today (Review Focus 2).
-- [ ] **Step 5: Run the gate, expect PASS.**
-- [ ] **Step 6: Browser check** (the Opus reviewer, with the code review). Into `task-6/`:
+- [x] **Step 5: Run the gate, expect PASS.**
+- [x] **Step 6: Browser check** (the Opus reviewer, with the code review). Into `task-6/`:
   1. **Sanity blocked:** navigate to `/` with an `initScript` that makes `fetch` reject for any URL containing `api.sanity.io` (wrap `window.fetch`; leave other URLs alone). `wait_for` one literal string from each fallback in `lib/fallbackContent.ts` and `lib/projectsData.ts` — a skill group, a certification title, an experience company, a project title, and `sravankumar0103@gmail.com` — and confirm two social links render. Screenshot each section.
   2. **Project page blocked:** same `initScript`, navigate to `/projects/arogyalens`. The page renders, and its tech chips equal `fallbackProjectDetails`' tech list for that slug, in order (Review Focus 2 — the reversed precedence in `resolveDetail`).
   3. **Sanity live:** navigate again without the `initScript`. `list_network_requests` shows `api.sanity.io` requests with status 200, and the section screenshots match the baseline.
   4. No new console errors in the live run (the blocked run's own fetch errors are expected).
-- [ ] **Step 7: Commit** `Move Sanity fallbacks into the query hooks`.
+- [x] **Step 7: Commit** `Move Sanity fallbacks into the query hooks`.
 
 **Reviewer looks hardest at:** the reversed `tech` precedence; that loading still shows the fallback (as before, `data` is `undefined` while loading); that nothing still reads `.data` from the four list hooks (grep the callers).
 
@@ -519,27 +519,27 @@ Earlier tasks can change a later task's baseline (the table notes where). The im
   - `ScrollRevealText` gets `tone?: 'default' | 'primary' | 'muted'` (default `'default'`) in place of `from`/`to`. Its private `TONES` map holds `default { from: 'rgba(255, 255, 255, 0.1)', to: '#c5c1b0' }`, `primary { from: 'rgba(255, 255, 255, 0.1)', to: 'hsl(11, 81%, 57%)' }` and `muted { from: '#1a1918', to: '#c5c1b0' }`, with a one-line comment that framer-motion cannot interpolate CSS variables (decision 6).
   - `globals.css` gains `@theme { --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1); }` (decision 7).
 
-- [ ] **Step 1: Add** `ease-constants`, `viewport-constants`, `primary-literal` and `reveal-colours` (audit `C3`, `C3`, `C16`, `C16`).
-- [ ] **Step 2: Run, expect FAIL** with **35** violations: `ease-constants` 10, `viewport-constants` 8, `primary-literal` 10 (12 at baseline, minus the 2 Task 2 deleted with `.glow-primary` and `.rule-divider`), `reveal-colours` 7.
-- [ ] **Step 3: Write `src/lib/motion.ts`** and the `ScrollRevealText` tone map.
-- [ ] **Step 4: Rewire the motion call sites.**
+- [x] **Step 1: Add** `ease-constants`, `viewport-constants`, `primary-literal` and `reveal-colours` (audit `C3`, `C3`, `C16`, `C16`).
+- [x] **Step 2: Run, expect FAIL** with **35** violations: `ease-constants` 10, `viewport-constants` 8, `primary-literal` 10 (12 at baseline, minus the 2 Task 2 deleted with `.glow-primary` and `.rule-divider`), `reveal-colours` 7.
+- [x] **Step 3: Write `src/lib/motion.ts`** and the `ScrollRevealText` tone map.
+- [x] **Step 4: Rewire the motion call sites.**
   - Experience and Projects: `{...rowEnter}` and `{...expandOnView}`, and `useInView(ref, { margin: VIEWPORT_CENTER_MARGIN })`.
   - Certifications and Projects chips: `{...slideInFromRight(0.1)}` and `{...slideInFromRight(0.2)}`.
   - Hero, Navbar and ProjectDetail: import the `EASE_*` constants.
   - Projects' two `ease-[cubic-bezier(0.16,1,0.3,1)]` classes become `ease-out-expo`.
-- [ ] **Step 5: Rewire the colours.**
+- [x] **Step 5: Rewire the colours.**
   - Projects and Contact use `tone="primary"`.
   - About uses `tone="muted"` and renders `ScrollRevealText` once, with `settings?.aboutHighlight || "I don't just write code; I build solutions that work."` (removing the C16 copy). **Check this against `About.tsx:34-39` first.** Today the two branches differ: the no-`aboutPara1` branch shows the hardcoded sentence, not `aboutHighlight`. Collapsing them makes Sanity's `aboutHighlight` appear in that branch where it does not today. If `aboutHighlight` is set in Sanity, that is a visible content change — report it and keep the hardcoded text in the fallback branch unless the owner says otherwise.
   - The Skills and Experience shadows use `hsl(var(--primary)/0.18)` and `hsl(var(--primary)/0.5)` inside the same `shadow-[…]` arbitrary values.
   - In `globals.css`, each `hsla(11, 81%, 57%, a)` becomes `hsl(var(--primary) / a)` and each `hsl(11, 81%, 57%)` becomes `hsl(var(--primary))`. Leave the `65%`/`45%` gradient stops; they are not tokens and are `DESIGN_UPGRADE.md` §1's to change.
   - The remaining `cubic-bezier(0.16, 1, 0.3, 1)` uses become `var(--ease-out-expo)`.
-- [ ] **Step 6: Run the gate, expect PASS.** Then prove the CSS still resolves: `grep -o "ease-out-expo[^}]*" artifacts/portfolio/dist/assets/*.css | head -3` shows the utility, and `grep -o "var(--primary)" artifacts/portfolio/dist/assets/*.css | wc -l` is higher than the value you recorded before Step 3 (it is **53** on today's `dist`). Use `grep -o … | wc -l`, not `grep -c`: the built CSS is a single line, so `grep -c` prints `1` before and after and can never show the increase. If an arbitrary shadow did not compile (a `/` inside brackets misparsed), the class is missing from the built CSS: fix that before continuing.
-- [ ] **Step 7: Browser check** (the Opus reviewer, with the code review). Into `task-7/`, at desktop and phone:
+- [x] **Step 6: Run the gate, expect PASS.** Then prove the CSS still resolves: `grep -o "ease-out-expo[^}]*" artifacts/portfolio/dist/assets/*.css | head -3` shows the utility, and `grep -o "var(--primary)" artifacts/portfolio/dist/assets/*.css | wc -l` is higher than the value you recorded before Step 3 (it is **53** on today's `dist`). Use `grep -o … | wc -l`, not `grep -c`: the built CSS is a single line, so `grep -c` prints `1` before and after and can never show the increase. If an arbitrary shadow did not compile (a `/` inside brackets misparsed), the class is missing from the built CSS: fix that before continuing.
+- [x] **Step 7: Browser check** (the Opus reviewer, with the code review). Into `task-7/`, at desktop and phone:
   1. Every baseline screenshot matches — `hsl(var(--primary))` must render exactly as `hsl(11, 81%, 57%)` did.
   2. The computed `box-shadow` of the Skills card and the Experience dot, and the computed `color` of a revealed Projects title character, equal the baseline strings exactly.
   3. Rows still scale in and the chips still slide in from the right (the presets replaced inline props value for value): screenshot a Projects row mid-entry at 200 ms and compare with the same moment at baseline — or, if timing makes that flaky, read the row's inline `transform` at 200 ms and confirm it is a `scale(…)` between 0.95 and 1.
   4. No new console errors.
-- [ ] **Step 8: Commit** `Centralise motion constants and colour tokens`.
+- [x] **Step 8: Commit** `Centralise motion constants and colour tokens`.
 
 **Reviewer looks hardest at:** that every spread preset equals the inline props it replaced, value for value (`once: false` in particular); that About renders the same text in both the Sanity and fallback cases; the built-CSS proof in Step 6.
 
@@ -559,24 +559,24 @@ Earlier tasks can change a later task's baseline (the table notes where). The im
   - `PillLink.tsx`: `export function PillLink({ label, icon, href }: { label: string; icon: ReactNode; href?: string })`. With `href` it renders an `<a target="_blank" rel="noopener noreferrer">` that stops click propagation. Without one it renders a `<span>`, because Certifications' chip already sits inside an `<a>` and nested anchors are invalid. Classes are Projects' current chip classes, with the group renamed `group/pill`. If D4 is "no", add `filled?: boolean` to switch to Certifications' resting background.
   - `projectsData.ts`: `export function codeUrl(project: { github?: string }, slug?: string): string | undefined` returns `undefined` when there is no `github` or the slug is in the module-private `NO_CODE_SLUGS` (moved from Projects). `export function liveUrl(project: { live?: string }): string | undefined` returns `undefined` when `live` is missing or `'#'`.
 
-- [ ] **Step 1: Add** `container-shell`, `page-shell`, `pill-chip` and `project-link-rules` (audit `C1`, `—`, `C4`, `C14`).
-- [ ] **Step 2: Run, expect FAIL** with 20 violations (`container-shell` 11 + `page-shell` 2 + `pill-chip` 3 + `project-link-rules` 4).
-- [ ] **Step 3: Write the three components and the two `projectsData.ts` helpers.**
-- [ ] **Step 4: Rewire.**
+- [x] **Step 1: Add** `container-shell`, `page-shell`, `pill-chip` and `project-link-rules` (audit `C1`, `—`, `C4`, `C14`).
+- [x] **Step 2: Run, expect FAIL** with 20 violations (`container-shell` 11 + `page-shell` 2 + `pill-chip` 3 + `project-link-rules` 4).
+- [x] **Step 3: Write the three components and the two `projectsData.ts` helpers.**
+- [x] **Step 4: Rewire.**
   - About, Experience, Skills, Projects and Certifications use `<Section id=…>`. About passes `containerClassName="relative z-10"`.
   - Hero, Contact and ProjectDetail have their own section shells, so they keep them and use `cn(CONTAINER, '…')`. ProjectDetail has **four** such containers (lines 124, 181, 200, 285), three at `max-w-7xl` and one at `max-w-3xl`: they become `cn(CONTAINER, 'max-w-7xl', …)` and `cn(CONTAINER, 'max-w-3xl', …)`. The `container-shell` rule's `(max-w-\w+ )?` group is what makes these four count, so none can be quietly skipped.
   - Home and ProjectDetail use `<PageShell>`.
   - The Projects Code/Live chips and the Certifications View chip use `<PillLink>`.
   - Projects and ProjectDetail use `codeUrl`/`liveUrl`. ProjectDetail's larger "View Code"/"Live Demo" buttons are a different design and stay as they are.
-- [ ] **Step 5: Run the gate, expect PASS.**
-- [ ] **Step 6: Run** `npx impeccable detect artifacts/portfolio/src`. Expect the same findings as after Task 2 and none new.
-- [ ] **Step 7: Browser check** (the Opus reviewer, with the code review; Review Focus 4). Into `task-8/`, at desktop and phone:
+- [x] **Step 5: Run the gate, expect PASS.**
+- [x] **Step 6: Run** `npx impeccable detect artifacts/portfolio/src`. Expect the same findings as after Task 2 and none new.
+- [x] **Step 7: Browser check** (the Opus reviewer, with the code review; Review Focus 4). Into `task-8/`, at desktop and phone:
   1. **Spacing:** every padding and container width in `metrics.json` matches the baseline exactly (0 px), on Home and the project page.
   2. **Parity:** every baseline screenshot matches, except the Certifications chip, which now has the Projects look (D4) — no resting background, label dimmed until hover.
   3. **Chips:** click a Projects "Code" chip. The current page's URL is unchanged (the row's detail link did not fire), and `list_pages` shows a new tab on the GitHub URL. Close that tab.
   4. **Link rules:** in `take_snapshot`, the hexapod row has no "Code" link and the CRM row (`live: '#'`) has no "Live" link; `/projects/hexapod-robotic-arm` has no "View Code" link.
   5. No new console errors.
-- [ ] **Step 8: Commit** `Extract Section, PageShell and PillLink`.
+- [x] **Step 8: Commit** `Extract Section, PageShell and PillLink`.
 
 **Reviewer looks hardest at:** that `cn`/`tailwind-merge` drops no class from About's container; that `<span>`/`<a>` is chosen correctly in Certifications; that the Projects row's `onClick` propagation behaviour is unchanged.
 
@@ -591,23 +591,23 @@ Earlier tasks can change a later task's baseline (the table notes where). The im
 - Consumes: framer-motion's `MotionConfig` and `useReducedMotion` (reuse the library's mechanism; don't hand-roll a `matchMedia` hook); Task 4's `setLenis`, `scrollToY` and `scrollToElement`.
 - Produces: `lib/lenis.ts` gains a private `prefersReducedMotion(): boolean` (`window.matchMedia('(prefers-reduced-motion: reduce)').matches`). The native fallbacks use `behavior: prefersReducedMotion() ? 'auto' : 'smooth'`.
 
-- [ ] **Step 1: Write the failing check.** It must print `0`: `grep -rcE "MotionConfig|useReducedMotion|prefers-reduced-motion" artifacts/portfolio/src | awk -F: '{s+=$2} END {print s}'`.
-- [ ] **Step 2: Implement.**
+- [x] **Step 1: Write the failing check.** It must print `0`: `grep -rcE "MotionConfig|useReducedMotion|prefers-reduced-motion" artifacts/portfolio/src | awk -F: '{s+=$2} END {print s}'`.
+- [x] **Step 2: Implement.**
   - `App` wraps everything in `<MotionConfig reducedMotion="user">`.
   - `SmoothScroll` reads `useReducedMotion()`. When it is true, it creates no Lenis and calls `setLenis(null)`, so every scroll goes native through Task 4's fallback. The effect depends on that value. **The preference is read at mount only.** framer-motion 12's `useReducedMotion` returns `useState(prefersReducedMotion.current)` and does not subscribe to media-query changes (its source carries a "TODO See if people miss automatically updating"), so a visitor who flips the OS setting mid-session sees it apply on reload. Do not claim live switching, and do not hand-roll a `matchMedia` listener to get it — that is a second mechanism beside the library's.
   - `HeroScene` uses `frameloop={!isVisible ? 'never' : reduce ? 'demand' : 'always'}`. **Off-screen stays `'never'` for everyone** — that is CLAUDE.md's hero pause guard, and `isVisible && !reduce ? 'always' : 'demand'` would quietly change the off-screen state to `'demand'` for every visitor, which is not a no-op. `'demand'` applies only while the hero is on screen and the visitor asked for reduced motion: it renders a still first frame rather than the blank canvas `'never'` gives from mount. This deliberately departs from `DESIGN_UPGRADE.md` §6's `frameloop="never"` line, for that reason; say so in the report.
   - `globals.css` gains one `@media (prefers-reduced-motion: reduce)` block that sets `animation-duration`, `animation-iteration-count: 1` and `transition-duration` to `0.01ms !important` on `*, ::before, ::after`, and `scroll-behavior: auto`.
   - `ScrollRevealText`'s colour sweep stays: colour is not motion.
-- [ ] **Step 3: Run** the Step 1 command, now non-zero, and the gate. Expect JS growth of 1 kB or less.
-- [ ] **Step 4: Browser check with the preference off** (the Opus reviewer). Into `task-9/off/`: re-run Task 4's checks 1–5 and Task 8's checks 1–2 — all must still pass (Review Focus 5: a visitor without the setting sees no change).
-- [ ] **Step 5: Browser check with the preference on.** `emulate { prefersReducedMotion: "reduce" }` and reload. Into `task-9/on/`:
+- [x] **Step 3: Run** the Step 1 command, now non-zero, and the gate. Expect JS growth of 1 kB or less.
+- [x] **Step 4: Browser check with the preference off** (the Opus reviewer). Into `task-9/off/`: re-run Task 4's checks 1–5 and Task 8's checks 1–2 — all must still pass (Review Focus 5: a visitor without the setting sees no change).
+- [x] **Step 5: Browser check with the preference on.** `emulate { prefersReducedMotion: "reduce" }` and reload. Into `task-9/on/`:
   1. `<html>` has **no** `lenis` class — scrolling is native.
   2. The hero canvas is present and its screenshot is not blank; two screenshots 1 s apart are identical (a still scene).
   3. Scroll a section into view; 100 ms later no element inside it has an inline `transform` other than `none` or the identity (no slide-in).
   4. Click a nav link: within 100 ms `scrollY` is within ±2 px of the baseline landing point (it jumps).
   5. "See more projects" from `/projects/arogyalens` still lands on the row (Task 4 check 3's tolerance).
   6. Clear the emulation afterwards. No new console errors.
-- [ ] **Step 6: Commit** `Respect prefers-reduced-motion`.
+- [x] **Step 6: Commit** `Respect prefers-reduced-motion`.
 
 **Reviewer looks hardest at:** that `getLenis()` returns `null` while reduced, so no caller holds a stale instance; that the off-screen hero frameloop is still `'never'` for a visitor without the preference; that `SmoothScroll`'s effect cancels its RAF and destroys Lenis on cleanup, since the effect now has a dependency and can re-run.
 
@@ -624,25 +624,25 @@ Earlier tasks can change a later task's baseline (the table notes where). The im
 - Consumes: `scrollToElement(target: HTMLElement, offsetTop: number)` (Task 4); `VIEWPORT_CENTER_MARGIN` (Task 7); `ScrollRevealText` with Task 7's `tone` prop.
 - Produces (in `Contact.tsx`, next to `iconForPlatform`): `function labelForPlatform(platform?: string): string` — `github` → `'GitHub'`, `linkedin` → `'LinkedIn'`, `email` → `'Email'`, `twitter` → `'X (Twitter)'`, `instagram` → `'Instagram'`, otherwise `'Website'`; and `SocialIcon({ href, icon, label }: { href: string; icon: ReactNode; label: string })`.
 
-- [ ] **Step 1: Add the guard rules** (see the [rule table](#guard-rule-table)): widen `native-scroll-in-lenis` to also catch `scrollIntoView(` (audit `C24`), and add `no-fake-href` (`C20`), `no-nbsp-split` (`C22`) and `no-infinite-loop` (`C23`).
-- [ ] **Step 2: Run, expect FAIL** with **4** violations, one each: `Hero.tsx` (`scrollIntoView`), `Certifications.tsx` (`|| '#'`), `ScrollRevealText.tsx` (`\u00A0`), `Hero.tsx` (`repeat: Infinity`).
-- [ ] **Step 3: Fix the six that don't change the look.**
+- [x] **Step 1: Add the guard rules** (see the [rule table](#guard-rule-table)): widen `native-scroll-in-lenis` to also catch `scrollIntoView(` (audit `C24`), and add `no-fake-href` (`C20`), `no-nbsp-split` (`C22`) and `no-infinite-loop` (`C23`).
+- [x] **Step 2: Run, expect FAIL** with **4** violations, one each: `Hero.tsx` (`scrollIntoView`), `Certifications.tsx` (`|| '#'`), `ScrollRevealText.tsx` (`\u00A0`), `Hero.tsx` (`repeat: Infinity`).
+- [x] **Step 3: Fix the six that don't change the look.**
   - **C18:** `SocialIcon` takes `label` and sets `aria-label={`${label} (opens in a new tab)`}` on its `motion.a`. The call site passes `labelForPlatform(s.platform)`.
   - **C19:** the copy-email `motion.div` becomes `motion.button type="button"` with `aria-label={`Copy email address ${email}`}`, keeping `onClick`, `whileHover` and `whileTap`. A button may hold only phrasing content, so its inner `div` and `motion.div` become `span`/`motion.span` with the **same classes** (`flex`/`inline-flex` still lays them out identically). Add `text-left`, since browsers centre button text. The Radix toast already announces "copied" through its live region, so add no `aria-live`.
   - **C20:** when `cert.link` is missing, render the row as a `<div>` with the same `className` instead of `<a href="#">`; keep the `<a>` (with `href`, `target`, `rel`) when it is present. No cast, no `any` — choose the tag before rendering, or render two branches around shared children.
   - **C26:** add `autoComplete="name"` to the name input and `autoComplete="email"` to the email input, beside their `{...register(...)}` spreads. The message `textarea` gets none — no autofill token fits free text.
-  - **C24:** "Explore work" calls `scrollToElement(target, parseFloat(getComputedStyle(target).scrollMarginTop) || 0)` for `#about`. Reading the computed `scroll-margin-top` keeps today's landing point — `scrollIntoView` honoured it (100px desktop, 80px under 768px, `globals.css:811-819`), and a Lenis scroll does not.
+  - **C24:** "Explore work" calls `scrollToElement(target, 0)` for `#about`. *(Run ruling, 6 Nov 2026 — replaces the earlier `scrollToElement(target, parseFloat(getComputedStyle(target).scrollMarginTop) || 0)`: Lenis 1.3.23 subtracts the target's `scroll-margin-top` itself, and after Task 9's fix the native branch does too, so passing the margin again would land About 100 px lower than today.)* With offset `0`, both paths honour `scroll-margin-top` exactly as `scrollIntoView` did (100px desktop, 80px under 768px, `globals.css`), so the landing point is unchanged.
   - **C25:** in `RotatingShapes`, create the material once with `useMemo(() => new THREE.MeshStandardMaterial({ … same values … }), [])` and dispose it in a `useEffect` cleanup. Build the 8 spheres once with `useMemo(() => Array.from({ length: 8 }, () => ({ speed, position, radius })), [])` using today's exact `Math.random()` formulas, and map over that. Do not touch `isVisible`, `frameloop` or the `IntersectionObserver` — that is CLAUDE.md's hero pause guard. (Disposing and then reusing a material is safe in three.js — it recompiles on next use — so StrictMode's dev-only double mount is not a problem.)
-- [ ] **Step 4: Fix the three visible ones (D7).**
+- [x] **Step 4: Fix the three visible ones (D7).**
   - **C21:** in `Projects` and `Experience`, `useInView(ref, { margin: VIEWPORT_CENTER_MARGIN, once: true })`. `isInView` feeds only `ScrollRevealText`'s `isActive` in both files, so nothing else changes: the title reveals once and stays revealed. Leave the `rowEnter`/`expandOnView` presets at `once: false`; they don't affect text contrast.
   - **C22:** in `ScrollRevealText`'s `isActive` branch, render `{char}` instead of `{char === " " ? "\u00A0" : char}`. This is safe because the character spans are plain inline (`characterClassName` adds only a hover colour); if anything makes them `inline-block`, wrap per word instead, since an inline-block space collapses to zero width.
   - **C23:** the hero scroll-hint dot's `repeat: Infinity` becomes `repeat: 1` — two 2-second cycles, 4 s in total, under WCAG's 5 s limit. It rests on its last keyframe (`opacity: 1`, `y: 0`), so the hint stays visible as a still dot.
-- [ ] **Step 5: Run the gate and the guard, expect PASS.** Then confirm each fix landed:
+- [x] **Step 5: Run the gate and the guard, expect PASS.** Then confirm each fix landed:
   - `grep -n "aria-label\|motion.button" artifacts/portfolio/src/components/sections/Contact.tsx` shows the button and the `SocialIcon` label.
   - `grep -n "once: true" artifacts/portfolio/src/components/sections/{Projects,Experience}.tsx` shows both `useInView` calls (unless D7 was "no").
   - `grep -c "useMemo" artifacts/portfolio/src/components/3d/HeroScene.tsx` prints at least `2`.
   - `npx impeccable detect artifacts/portfolio/src` shows no finding that was not there after Task 2.
-- [ ] **Step 6: Browser check** (the Opus reviewer, with the code review). Into `task-11/`. Navigate with an `initScript` that stubs the clipboard (`navigator.clipboard.writeText = async (t) => { window.__copied = t; }`) — headless Chrome may refuse real clipboard access, which would fail the check for the wrong reason.
+- [x] **Step 6: Browser check** (the Opus reviewer, with the code review). Into `task-11/`. Navigate with an `initScript` that stubs the clipboard (`navigator.clipboard.writeText = async (t) => { window.__copied = t; }`) — headless Chrome may refuse real clipboard access, which would fail the check for the wrong reason.
   1. **C19 copy-email, by keyboard:** `press_key` Tab until `document.activeElement` is a `BUTTON` whose `aria-label` starts with "Copy email address". Press Enter: `window.__copied` equals the email and the toast's "copied" text appears. Reset `window.__copied`, press Space: same result.
   2. **C18 social links:** in `take_snapshot`, the links read "GitHub (opens in a new tab)" and "LinkedIn (opens in a new tab)".
   3. **C20 certifications:** `document.querySelectorAll('a[href="#"]').length` is `0`. Clicking a certificate row that has no link leaves `scrollY` unchanged.
@@ -654,7 +654,7 @@ Earlier tasks can change a later task's baseline (the table notes where). The im
   9. **C26 autofill:** `evaluate_script` confirms the name input's `autocomplete` is `"name"` and the email input's is `"email"`, and `list_console_messages` no longer shows Chrome's "missing autocomplete" notice.
   10. **Whole-page accessibility:** the `lighthouse_audit` accessibility score is at least the baseline's, and its `link-name` audit passes. `npx impeccable detect http://127.0.0.1:4173` shows no finding that is not in `baseline/detect.txt`.
   11. No new console errors.
-- [ ] **Step 7: Commit** `Fix accessibility issues from the UI audit`.
+- [x] **Step 7: Commit** `Fix accessibility issues from the UI audit`.
 
 **Reviewer looks hardest at:** that the copy-email button contains only phrasing content and looks pixel-identical; that `Certifications` has no cast and no fake link left; that "Explore work" lands where it did on both breakpoints; that the hero pause guard is untouched and the material is disposed exactly once per mount.
 
@@ -665,8 +665,8 @@ Earlier tasks can change a later task's baseline (the table notes where). The im
 **Files:**
 - Modify: `docs/AUDIT_REPORT.md`, `CLAUDE.md`, `WORKSPACE_GUIDE.md`, `docs/specs/DESIGN_UPGRADE.md` (two factual lines only), this plan's `Status` line
 
-- [ ] **Step 0: Check the docs are clean before editing.** Run `git status --short docs CLAUDE.md WORKSPACE_GUIDE.md .gitignore`. Expected: no output (this plan went into Task 1's commit). If anything is listed, stop and report it: Task 10's edits are left unstaged for the owner, so they must not mix with anything else.
-- [ ] **Step 1: `AUDIT_REPORT.md`.**
+- [x] **Step 0: Check the docs are clean before editing.** Run `git status --short docs CLAUDE.md WORKSPACE_GUIDE.md .gitignore`. Expected: no output (this plan went into Task 1's commit). If anything is listed, stop and report it: Task 10's edits are left unstaged for the owner, so they must not mix with anything else.
+- [x] **Step 1: `AUDIT_REPORT.md`.**
   - Move C1, C2, C4–C10 and the new C12–C17 to "Resolved", one line each with the date. **C3 moves only in part** — the easing, viewport margin and reveal colours are resolved; its entry-variant bullet stays open (see "Not in this plan"). C11 stays open.
   - Also fix these, which this branch makes wrong: the Repo hygiene lines about `pnpm-workspace.yaml` and `hello.ts` (both resolved by Tasks 2 and 1), the Track A item 1 line that lists `gsap` among the bundled libraries (it is installed but not imported, so it does not ship), and the "see C7" cross-reference.
   - Correct the "Two icon libraries" skip line (C13: only `lucide-react` remains).
@@ -675,7 +675,7 @@ Earlier tasks can change a later task's baseline (the table notes where). The im
   - Add one line naming the guard: "`pnpm run check:reuse` (CI) keeps Track C closed; add a rule when you remove a duplicate."
   - Record the Impeccable audit: add C18–C26 to "Resolved" (those Task 11 shipped; any D7 declined stay open), note the unused tooltip as removed, and add a new **"Track D — UI audit (6 Nov 2026)"** section listing every "Not fixed here" item from this plan's [Impeccable audit](#impeccable-audit-6-nov-2026) section, one line each with its severity and file. Put the 11/20 score in the build-state line.
   - The duplicate-files section: `tooltip.tsx` was one of the files `portfolio` shared with `mockup-sandbox`. Task 2 deletes the portfolio copy, so that pair is no longer a duplicate — update the count.
-- [ ] **Step 2: `CLAUDE.md`.**
+- [x] **Step 2: `CLAUDE.md`.**
   - Commands: add `pnpm run check:reuse` and `pnpm --filter @workspace/scripts run test`.
   - Traps: delete the now-false traps (dead `index.css`, `tw-animate-css` import, the `main.tsx` observer, the three dead classes, "two icon libraries"). Add one trap: "`globals.css` ~4–590 is an inlined `tw-animate-css` — except the Lenis base styles at ~230–250, which are ours; the toast animations need the rest."
   - Fix three more lines this branch makes wrong: "**`scripts`** — one `hello.ts`" (Task 1 replaces it with the guard), the Sanity rule "`data ?? fallback`" (Task 6 moves the fallback into the hooks), and the no-code-splitting trap that lists `three`, `gsap` and `framer-motion` (gsap is installed but never imported, so it does not ship in the bundle). Also rewrite the stale comment at `sanityQueries.ts:3` that tells readers components use `data ?? fallback` — that one belongs to Task 6 Step 3.
@@ -687,12 +687,12 @@ Earlier tasks can change a later task's baseline (the table notes where). The im
   - **Where to look → `docs/plans/`:** add that a plan runs with `/run-plan <plan>` (`.claude/commands/run-plan.md`), or when the owner says "go"; plans follow the "Owner decisions → Execution → Task dispatch" shape this plan uses.
   - Add `gsap` and `@gsap/react` to Traps as **installed but unused on purpose** — kept for `DESIGN_UPGRADE.md` §6 (D3). Like `BackToTop`/`CustomCursor`, don't delete them in a cleanup sweep.
   - Reuse section: "`portfolio` and `mockup-sandbox` already share six byte-identical files" becomes five — Task 2 deleted the portfolio's `tooltip.tsx`.
-- [ ] **Step 3: `WORKSPACE_GUIDE.md`.** Add the two guard commands under Key Commands.
-- [ ] **Step 4: `DESIGN_UPGRADE.md`.** Make two factual corrections:
+- [x] **Step 3: `WORKSPACE_GUIDE.md`.** Add the two guard commands under Key Commands.
+- [x] **Step 4: `DESIGN_UPGRADE.md`.** Make two factual corrections:
   - §1 Motion: "currently inconsistent" → "now centralised in `src/lib/motion.ts`; change the values there".
   - §1 Spacing: name `Section.tsx` as the one place to change the padding.
   - Change nothing else; it is the owner's spec. Two §6 lines are already inaccurate and stay so: "GSAP already bundled" (gsap is installed but never imported, so it is not in the bundle), and §6's `frameloop="never"`, which now differs from what Task 9 ships. **Name both in your report instead of editing them**; they are the owner's to decide.
-- [ ] **Step 5: Leave these changes unstaged.** No commit — doc edits stay unstaged for the owner's own review (CLAUDE.md → Git), and this run makes exactly 10 commits, one per Task 1–9 and 11. Report the files touched; the owner commits them in their own words if they agree with the edits.
+- [x] **Step 5: Leave these changes unstaged.** No commit — doc edits stay unstaged for the owner's own review (CLAUDE.md → Git), and this run makes exactly 10 commits, one per Task 1–9 and 11. Report the files touched; the owner commits them in their own words if they agree with the edits.
 
 ---
 
