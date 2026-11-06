@@ -4,5 +4,8 @@
   "assets": {
     "directory": "./dist",
     "not_found_handling": "single-page-application"
-  }
+  },
+  // Required by `wrangler preview`, which Cloudflare runs for non-main branch builds.
+  // Empty on purpose: previews reuse the settings above; production is unaffected.
+  "previews": {}
 }
