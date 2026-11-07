@@ -28,7 +28,9 @@ it is static assets plus client-side `fetch` calls to Sanity and Web3Forms.
   **dormant backend scaffold.** One route (`GET /api/healthz`), an empty Drizzle schema, generated
   clients for that one endpoint. The live site does not import any of it. Leave it alone unless the
   task names it explicitly.
-- **`scripts`** — one `hello.ts`. Effectively empty.
+- **`scripts`** (`@workspace/scripts`) — the reuse guard: `src/check-reuse.ts` scans
+  `artifacts/portfolio/src` against the rules in `src/reuse-rules.ts` and has its own `node:test`
+  suite. Run as `pnpm run check:reuse`; CI runs it.
 
 ## Content lives in Sanity, not in the repo
 
@@ -37,9 +39,12 @@ The site reads content at runtime from Sanity's **live** query API (not the CDN)
 `sanityQueries.ts` holds the GROQ queries and the typed React Query hooks.
 
 - `projectId` / `dataset` are public identifiers, not secrets. They are committed on purpose.
-- **Every section falls back to hardcoded content** (`data ?? fallback`, see `lib/projectsData.ts`).
-  That fallback is the safety net that keeps the site up when Sanity is empty or unreachable —
-  never remove a fallback, and when you add a Sanity-backed field, add its fallback in the same change.
+- **Every section falls back to hardcoded content.** The list hooks in `sanityQueries.ts`
+  (`useSanityProjects`, `useSanityExperience`, `useSanitySkills`, `useSanityCertifications`) apply
+  their own fallback through `orFallback` and return `T[]`, never `undefined` — a component cannot
+  forget it. The fallbacks live in `lib/fallbackContent.ts` and `lib/projectsData.ts`. That fallback
+  is the safety net that keeps the site up when Sanity is empty or unreachable — never remove one,
+  and when you add a Sanity-backed field or section, add its fallback in the same change.
 - Document types live in `studio/schemaTypes/` (`siteSettings`, `project`, `experience`,
   `skillGroup`, `certification`). A new field is a two-sided change: the schema in `studio/`, the
   GROQ projection and TypeScript interface in `sanityQueries.ts`. Shipping one without the other
@@ -55,16 +60,20 @@ Run from the repo root unless stated otherwise.
 - **Build everything:** `pnpm run build` (typechecks first, then builds each package).
 - **Just the live site:** `pnpm --filter portfolio run typecheck` / `run build` / `run dev`.
 - **Preview a production build:** `pnpm --filter portfolio run serve`.
+- **Reuse guard:** `pnpm run check:reuse` — fails on any duplicate the cleanup removed. Run it with
+  the gate. Add a rule to `scripts/src/reuse-rules.ts` when you remove a duplicate.
+- **Guard tests:** `pnpm --filter @workspace/scripts run test`.
 - **Install:** `pnpm install`. In CI it is `pnpm install --frozen-lockfile`.
 - **Studio** (from `studio/`, npm not pnpm): `npm run dev`, `npm run build`, `npm run deploy`.
 - **Dormant backend, only if asked:** `pnpm --filter @workspace/api-server run dev`,
   `pnpm --filter @workspace/api-spec run codegen`, `pnpm --filter @workspace/db run push`.
 
-There is no test suite, no linter and no formatter script. `prettier` is installed at the root but
-not wired to a command — do not reformat files wholesale. **Typecheck + build is the whole
-verification story**, so actually run both before claiming a change works.
+There is no test suite for the site, no linter and no formatter script (the only tests are the
+guard's own). `prettier` is installed at the root but not wired to a command — do not reformat files
+wholesale. **Typecheck + build + `check:reuse` is the whole verification story**, so actually run
+them before claiming a change works.
 
-CI (`.github/workflows/ci.yml`) runs typecheck + build on every push and PR to `main`. If it is
+CI (`.github/workflows/ci.yml`) runs typecheck, `check:reuse` plus the guard tests, and build on every push and PR to `main`. If it is
 green locally it is green there; pin-version drift is the only usual difference.
 
 ## Where to look
@@ -99,8 +108,10 @@ Read the one doc for the area you are touching.
 - `docs/AUDIT_REPORT.md` — **living document.** Open issues, what is already resolved, and what is
   deliberately skipped. Read it before proposing any cleanup: the thing you spotted may already be
   there, already decided against, or already fixed. **Track C is the duplication and dead-code
-  backlog** — check it before extracting anything, and add to it when you find a new duplicate you
-  are not in a position to fix. Update it when you resolve an item.
+  backlog** (almost all closed; `check:reuse` keeps it closed) — check it before extracting
+  anything, and add to it when you find a new duplicate you are not in a position to fix. **Track D
+  is the open UI-audit backlog** (contrast, focus, landmarks, token layer). Update the file when you
+  resolve an item.
 - `docs/specs/DESIGN_UPGRADE.md` — the visual/UX redesign spec: design tokens, motion language, hero
   direction, project-page restructure, bundle-splitting plan, accessibility rules, and a list of
   2026 clichés to avoid. **Spec only — nothing in it is implemented.** Read it before any design,
@@ -109,7 +120,9 @@ Read the one doc for the area you are touching.
 - `README.md` — public-facing, for visitors. Keep it short; it is not a place for internal notes.
 - `WORKSPACE_GUIDE.md` — monorepo stack summary and the cross-package commands.
 - `docs/plans/` — implementation plans. Before starting multi-step work, check whether a plan for
-  it already exists; when executing one, follow it and tick its checkboxes.
+  it already exists; when executing one, follow it and tick its checkboxes. A plan runs with
+  `/run-plan <plan>` (`.claude/commands/run-plan.md`), or when the owner says "go"; plans follow the
+  "Owner decisions → Execution → Task dispatch" shape of `docs/plans/2026-11-05-reuse-cleanup.md`.
 - `pnpm-workspace.yaml` — workspace globs, the dependency **catalog**, and the supply-chain policy.
 
 Do not create new tracking docs; fold findings into `AUDIT_REPORT.md` or `DESIGN_UPGRADE.md`.
@@ -128,8 +141,14 @@ the repo root:
 
 ```bash
 npx impeccable install --providers=claude --scope=project --yes        # skill, agents, hook
-claude mcp add --transport http watermelon https://mcp.watermelon.sh/mcp  # Watermelon, local scope
+claude mcp add --transport http watermelon --scope user https://mcp.watermelon.sh/mcp  # Watermelon
+# Chrome DevTools MCP — from Git Bash; MSYS_NO_PATHCONV=1 stops it rewriting /c into C:/
+MSYS_NO_PATHCONV=1 claude mcp add chrome-devtools --scope user -- cmd /c npx -y chrome-devtools-mcp@1.12.0 --isolated --headless --no-usage-statistics --no-performance-crux --viewport 1440x900
 ```
+
+Both MCP servers are at **user scope**, not local: VS Code-based IDEs on Windows open the repo as
+`d:\…` (lowercase drive) while local-scope servers are stored under `D:/…`, and the mismatch makes
+the IDE session silently load no project servers (moved 6 Nov 2026).
 
 Never `git add -f` anything under those paths. `PRODUCT.md` and `DESIGN.md` are the exception:
 they are project content, not tooling, and are committed at the root.
@@ -157,15 +176,15 @@ A design vocabulary plus a reviewer and a slop detector. Type `/impeccable` for 
   conflict instead of resolving it.
 
 **Watermelon UI** (https://ui.watermelon.sh, MIT, 800+ components, blocks, dashboards) — a
-shadcn-style registry, connected as the `watermelon` MCP server (local scope, no API key). Use it
+shadcn-style registry, connected as the `watermelon` MCP server (user scope, no API key). Use it
 for *inspiration and source*: `search`, `get_inspiration`, `get_component`, `compose_page`.
 
 - **Reuse still wins.** Search `src/components/` first. Take from Watermelon only what the site
   does not already have, and adapt it to the existing tokens and motion constants — never paste a
   second copy of something we already have in a different style.
-- **Do not run `npx shadcn add …` yet.** `components.json` still points at the dead
-  `src/index.css` (`AUDIT_REPORT.md` C10), so shadcn would write tokens into a file the app never
-  loads. Resolve C10 first, or hand-port the component.
+- **`npx shadcn add …` is possible** now that `components.json` points at `src/globals.css`, but
+  it writes tokens in its own colour format. Convert them to this repo's raw HSL
+  triplets by hand, or the Tailwind v4 mapping breaks. Hand-porting is still usually simpler.
 - **Watermelon components pull in dependencies** (Radix, Motion). Those are dependency changes —
   get approval, and check `catalog:` in `pnpm-workspace.yaml` before adding. The 1-day
   `minimumReleaseAge` still applies.
@@ -173,6 +192,14 @@ for *inspiration and source*: `search`, `get_inspiration`, `get_component`, `com
   visible focus states, and no new `any`.
 - The MCP is a third-party remote server; it receives the search queries and component requests
   you send it. Do not put secrets, `.env` values or private content in those calls.
+
+**Chrome DevTools MCP** (`chrome-devtools-mcp@1.12.0`, the `chrome-devtools` server) — a headless
+Chrome driven by agents, in an isolated throwaway profile so the owner's real logins are never
+touched, with usage statistics and CrUX lookups off so no page URL leaves the machine. Plan runs
+use it for browser checks (screenshots, scroll landings, computed styles, console, Lighthouse)
+against `vite preview` on `127.0.0.1:4173`: the owner allows a run to serve that preview for its
+checks only, and it is never left running. Outside a plan run, the "never start a dev server" rule
+still holds.
 
 ## Keeping docs current
 
@@ -188,12 +215,9 @@ Docs fall behind the code. When a doc and the code disagree, the code is right a
 
 ## Traps
 
-- **`artifacts/portfolio/src/index.css` is dead code.** `main.tsx` imports `globals.css` only;
-  nothing imports `index.css`. But `components.json` still points shadcn at `index.css`, so a
-  `shadcn add` writes tokens into a file the app never loads. Real tokens and styles live in
-  `src/globals.css` (`:root` block ~line 652). Edit `globals.css`.
-- **`index.css` references `tw-animate-css`, which is not a declared dependency of `portfolio`.**
-  It builds only because the file is unused. Do not revive `index.css` without declaring the package.
+- **`globals.css` ~4–590 is an inlined `tw-animate-css`** — except the Lenis base styles at
+  ~230–250, which are ours; the toast animations need the rest. Real tokens and styles live in the
+  same file (`:root` block ~line 644). `tw-animate-css` is not a dependency: do not import it.
 - **Design tokens are raw HSL triplets** (`--background: 11 6% 6%`), consumed as
   `hsl(var(--background))` in the `@theme inline` block. Write new tokens the same way — a bare
   hex or `hsl(...)` value breaks the Tailwind v4 mapping.
@@ -203,22 +227,18 @@ Docs fall behind the code. When a doc and the code disagree, the code is right a
   previously ran their own (Navbar, Contact) were deliberately changed to delegate to it. Adding a
   competing RAF loop re-breaks scroll smoothness, which took real work to fix.
 - **The 3D hero pauses when scrolled off-screen** on purpose. Do not remove that guard.
-- **`main.tsx` runs a `MutationObserver` on the whole body for `.text-reveal*` classes that no
-  component applies.** It is dead weight that fires on every DOM mutation, not a mechanism to build
-  on (`AUDIT_REPORT.md` C8). Do not wire new work into it without deciding its fate first.
-- **`glow-primary`, `mask-up` and `rule-divider` in `globals.css` are unused.** The other custom
-  classes there (`gold-text`, `hover-lift`, `premium-card*`, `glow-hover`, `premium-gradient-text`)
-  are live — check before deleting anything in that file.
-- **No code splitting yet** — `three`, `gsap` and `framer-motion` all ship in one ~1.6MB chunk.
-  That is a known open item tied to the hero rework (`DESIGN_UPGRADE.md` §6); do not fix it as a
-  drive-by, it touches the same code.
+- **No code splitting yet** — `three`, `@react-three/fiber`, `@react-three/drei` and `framer-motion`
+  all ship in one ~1.6MB chunk. That is a known open item tied to the hero rework
+  (`DESIGN_UPGRADE.md` §6); do not fix it as a drive-by, it touches the same code.
+- **`gsap` and `@gsap/react` are installed but unused on purpose** — kept for `DESIGN_UPGRADE.md` §6,
+  so they are not in the bundle today. Like `BackToTop`/`CustomCursor`, do not delete them in a
+  cleanup sweep.
 - **Desktop-only navigation is intentional.** A mobile hamburger menu was built and explicitly
   reverted by the user. Do not re-add it unprompted.
 - **`BackToTop` and `CustomCursor` are unused on purpose** — staged for `DESIGN_UPGRADE.md` §5, not
   dead code. Do not delete them in a cleanup sweep.
-- **Fonts are loaded three times over**: `index.html` (Inter), `globals.css` (Plus Jakarta Sans,
-  Outfit, Inter), `index.css` (Orbitron, Space Grotesk). Only the `globals.css` and `index.html`
-  imports actually reach users. Touch this only as part of the planned type cleanup.
+- **Fonts are loaded twice over**: `index.html` (Inter) and `globals.css` (Plus Jakarta Sans,
+  Outfit, Inter). Touch this only as part of the planned type cleanup.
 - **`VITE_WEB3FORMS_KEY`** drives the contact form and is set in Cloudflare, not in the repo.
   `.env*` is gitignored; `.env.example` documents it. Never commit a real key. Note that Web3Forms
   delivery is currently unreliable and a replacement decision is pending (`AUDIT_REPORT.md` item 3).
@@ -226,14 +246,14 @@ Docs fall behind the code. When a doc and the code disagree, the code is right a
   `artifacts/portfolio/wrangler.jsonc`. A `_redirects` file conflicts with it and was removed —
   do not add one back.
 - **Hash-scroll navigation in `Home.tsx` / `ProjectDetail.tsx` is hand-rolled** and known to be
-  so. Leave it unless the task is about navigation.
-- Two icon libraries (`lucide-react` + `react-icons`) coexist knowingly. Not a bug to fix.
+  so. Leave it unless the task is about navigation. It does scroll through `lib/lenis.ts`.
 
 ## Reuse before you write. No duplicates.
 
 This is the rule the codebase is judged on. The repo has already paid for ignoring it — see
-Track C in `AUDIT_REPORT.md`, where the same section shell is copy-pasted five times and the same
-easing curve is typed out in four files.
+Track C in `AUDIT_REPORT.md`, where the same section shell was copy-pasted five times and the same
+easing curve typed out in four files. The cleanup moved each into one module, and
+`pnpm run check:reuse` now fails when one comes back.
 
 - **Search first, always.** Before writing a component, hook, helper, type, constant or utility
   class string, grep for one that already exists — `src/components/ui/`, `src/components/layout/`,
@@ -243,13 +263,23 @@ easing curve is typed out in four files.
 - **The second occurrence is the warning; the third is a bug.** Writing the same markup, the same
   class list, the same animation config or the same guard a second time means stopping and
   extracting it. Do not let a pattern reach three copies.
-- **Shared values live in one place.** Easings, durations and viewport margins belong in a motion
-  module, not inline. Design values belong in the `globals.css` tokens, not as literal hex or HSL
-  in a component. Content fallbacks belong next to their query, not re-written per section.
+- **Shared values live in one place.** Easings, durations and viewport margins belong in
+  `lib/motion.ts` (`EASE_OUT_QUINT`, `EASE_OUT_EXPO`, `VIEWPORT_CENTER_MARGIN`, and the presets
+  `rowEnter`, `expandOnView`, `slideInFromRight`, `fadeUpOnMount`, with `useRowInView` in
+  `hooks/use-row-in-view.ts`), not inline. Design values belong in the `globals.css` tokens, not as
+  literal hex or HSL in a component. Content fallbacks belong in `lib/fallbackContent.ts` and
+  `lib/projectsData.ts`, applied by the hooks through `orFallback` — never re-written per section.
+- **The things that already exist — use them.** Scrolling goes through `lib/lenis.ts`
+  (`scrollToY`, `scrollToElement`, `reassert`, `scrollEasing`, `SCROLL_DURATION`) — never
+  `window.scrollTo`, `scrollIntoView` or a second Lenis reference outside that file. Section shells are `Section` and
+  `CONTAINER` (`components/layout/Section.tsx`), the page shell is `PageShell`, the chip link is
+  `components/ui/PillLink.tsx`, and project link rules are `codeUrl`/`liveUrl` in
+  `lib/projectsData.ts`.
 - **A near-copy is worse than a duplicate**, because it looks intentional. If you must branch an
   existing thing, add a prop to the original instead of pasting a variant beside it.
 - **Reuse across packages is a workspace package, not a copy-paste.** `portfolio` and
-  `mockup-sandbox` already share six byte-identical files — do not add a seventh. If both genuinely
+  `mockup-sandbox` already share five identical files (four byte-identical; `use-toast.ts` differs by
+  one comment) — do not add a sixth. If both genuinely
   need it, say so and propose `lib/ui`; never paste.
 - **Deleting a duplicate is in scope when you are already editing it.** Finding one elsewhere is
   not — note it in `AUDIT_REPORT.md` and keep your diff clean.
@@ -303,7 +333,21 @@ easing curve is typed out in four files.
 Use the smallest model and lowest effort that can do the task. Move up only on evidence — a failed
 attempt, a reviewer finding — or when the task is genuinely design-heavy or risky.
 
-- Searching, reading code, mechanical edits whose exact content is already decided → Haiku.
+**In a plan run the owner's standing rule applies, and there is no Haiku:**
+
+- **Build with Sonnet** — high effort, or xhigh when the task touches behaviour (scroll, motion,
+  fallbacks, layout, accessibility).
+- **Review with Opus.**
+- **Fix with Sonnet at xhigh**, and escalate to Opus when that does not close the finding.
+- **Final whole-branch review on Opus at high effort.**
+
+Four agents in `.claude/agents/` encode this: `portfolio-sonnet-high` (mechanical or self-testing
+tasks), `portfolio-sonnet-xhigh` (behaviour-touching tasks and first-line fixes),
+`portfolio-opus-review` (per-task review and browser checks, read-only) and `portfolio-opus-high`
+(escalation fixes and the final branch review).
+
+Outside a plan run:
+
 - Component work, small integration fixes, diff review → Sonnet.
 - Opus is for design direction, the hero/3D work, bundle architecture, debugging a smaller model
   already failed at, and the final review of a branch.

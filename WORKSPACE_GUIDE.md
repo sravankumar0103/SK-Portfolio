@@ -20,6 +20,8 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
+- `pnpm run check:reuse` — the reuse guard: fails on duplicates the cleanup removed (CI runs it)
+- `pnpm --filter @workspace/scripts run test` — the guard's own tests
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
 - `pnpm --filter @workspace/api-server run dev` — run API server locally

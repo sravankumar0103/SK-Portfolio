@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { scrollToElement } from '@/lib/lenis';
+import { EASE_OUT_QUINT } from '@/lib/motion';
 
 type NavItem = {
   name: string;
@@ -59,21 +61,7 @@ export function Navbar() {
     const targetId = href.substring(1);
     const target = document.getElementById(targetId);
     if (!target) return;
-
-    // Delegate the scroll-to-target animation to Lenis's own RAF loop
-    // (already running in SmoothScroll.tsx) instead of a second, competing
-    // RAF loop here. Lenis auto-interrupts on real user wheel/touch input.
-    const lenis = (window as any).__lenis;
-    if (lenis) {
-      lenis.scrollTo(target, {
-        offset: -SCROLL_MARGIN_TOP,
-        duration: 1.2,
-        easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      });
-    } else {
-      const rect = target.getBoundingClientRect();
-      window.scrollBy({ top: rect.top - SCROLL_MARGIN_TOP, behavior: 'smooth' });
-    }
+    scrollToElement(target, SCROLL_MARGIN_TOP);
   };
 
   return (
@@ -81,7 +69,7 @@ export function Navbar() {
       <motion.div
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 1, ease: EASE_OUT_QUINT }}
         className="flex items-center px-6 py-2 rounded-full border border-white/5 bg-black/30 backdrop-blur-md shadow-[0_8px_32px_0_rgba(0,0,0,0.8)] pointer-events-auto"
       >
         <nav className="flex gap-5 md:gap-7 items-center">

@@ -1,7 +1,14 @@
-import React, { Suspense, useEffect, useRef, useState, Component } from 'react';
+import React, { Suspense, useEffect, useMemo, useRef, useState, Component } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Float, PerspectiveCamera, Environment } from '@react-three/drei';
 import * as THREE from 'three';
+import { useReducedMotion } from 'framer-motion';
+
+interface SmallSphere {
+  speed: number;
+  position: [number, number, number];
+  radius: number;
+}
 
 function RotatingShapes({ mousePosition }: { mousePosition: React.MutableRefObject<{ x: number; y: number }> }) {
   const group = useRef<THREE.Group>(null);
@@ -26,12 +33,31 @@ function RotatingShapes({ mousePosition }: { mousePosition: React.MutableRefObje
     }
   });
 
-  const material = new THREE.MeshStandardMaterial({
-    color: '#1a1a1a',
-    metalness: 0.9,
-    roughness: 0.1,
-    envMapIntensity: 1,
-  });
+  // Built once per mount and disposed on unmount; a render-time `new` would leak
+  // a material (and its compiled program) on every re-render.
+  const material = useMemo(
+    () => new THREE.MeshStandardMaterial({
+      color: '#1a1a1a',
+      metalness: 0.9,
+      roughness: 0.1,
+      envMapIntensity: 1,
+    }),
+    [],
+  );
+  useEffect(() => () => material.dispose(), [material]);
+
+  const spheres = useMemo(
+    () => Array.from({ length: 8 }, (): SmallSphere => ({
+      speed: 1 + Math.random(),
+      position: [
+        (Math.random() - 0.5) * 8,
+        (Math.random() - 0.5) * 8,
+        (Math.random() - 0.5) * 8 - 2,
+      ],
+      radius: 0.1 + Math.random() * 0.15,
+    })),
+    [],
+  );
 
   return (
     <group ref={group}>
@@ -46,17 +72,10 @@ function RotatingShapes({ mousePosition }: { mousePosition: React.MutableRefObje
         </mesh>
       </Float>
       {/* Scattered small spheres */}
-      {[...Array(8)].map((_, i) => (
-        <Float key={i} speed={1 + Math.random()} rotationIntensity={0.5} floatIntensity={1}>
-          <mesh 
-            position={[
-              (Math.random() - 0.5) * 8, 
-              (Math.random() - 0.5) * 8, 
-              (Math.random() - 0.5) * 8 - 2
-            ]} 
-            material={material}
-          >
-            <sphereGeometry args={[0.1 + Math.random() * 0.15, 32, 32]} />
+      {spheres.map((sphere, i) => (
+        <Float key={i} speed={sphere.speed} rotationIntensity={0.5} floatIntensity={1}>
+          <mesh position={sphere.position} material={material}>
+            <sphereGeometry args={[sphere.radius, 32, 32]} />
           </mesh>
         </Float>
       ))}
@@ -105,6 +124,7 @@ export function HeroScene() {
   // out of view — pauses the R3F render loop instead of rendering frames
   // nobody sees.
   const [isVisible, setIsVisible] = useState(true);
+  const reduce = useReducedMotion();
 
   const handlePointerMove = (e: React.PointerEvent) => {
     const x = (e.clientX / window.innerWidth) * 2 - 1;
@@ -129,7 +149,7 @@ export function HeroScene() {
     <WebGLErrorBoundary>
       <div ref={containerRef} className="absolute inset-0 z-0 bg-background" onPointerMove={handlePointerMove}>
         <Canvas
-          frameloop={isVisible ? 'always' : 'never'}
+          frameloop={!isVisible ? 'never' : reduce ? 'demand' : 'always'}
           onCreated={({ gl }) => {
             if (!gl || !gl.getContext()) {
               throw new Error('WebGL not available');

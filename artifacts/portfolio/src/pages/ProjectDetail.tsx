@@ -2,14 +2,17 @@ import { useEffect } from 'react';
 import { Link, useParams } from 'wouter';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import { Github, ExternalLink, ArrowUpRight, Sparkles } from 'lucide-react';
-import { useSanityProject, type SanityProjectDetail } from '../lib/sanityQueries';
-import { fallbackProjectDetails } from '../lib/projectsData';
+import { useSanityProject, orFallback, type SanityProjectDetail } from '../lib/sanityQueries';
+import { fallbackProjectDetails, codeUrl, liveUrl } from '../lib/projectsData';
 import { imageUrl } from '../lib/sanity';
+import { reassert, scrollToY } from '../lib/lenis';
+import { EASE_OUT_QUINT, fadeUpOnMount } from '../lib/motion';
+import { cn } from '../lib/utils';
+import { CONTAINER } from '../components/layout/Section';
+import { PageShell } from '../components/layout/PageShell';
 import { PortableBody } from '../components/ui/PortableBody';
 import { CoverflowGallery } from '../components/ui/CoverflowGallery';
 import NotFound from './not-found';
-
-const EASE = [0.22, 1, 0.36, 1] as const;
 
 // Combine CMS data with the bundled in-depth write-up.
 // The curated fallback supplies the detailed text (overview, body, outcomes) so
@@ -25,8 +28,9 @@ function resolveDetail(
     ...fallback,
     title: sanity.title || fallback.title,
     coverImageUrl: sanity.coverImageUrl || fallback.coverImageUrl,
-    gallery: sanity.gallery && sanity.gallery.length ? sanity.gallery : fallback.gallery,
-    tech: fallback.tech && fallback.tech.length ? fallback.tech : sanity.tech,
+    gallery: orFallback(sanity.gallery, fallback.gallery),
+    // Reversed on purpose: the bundled write-up's tech list wins over the CMS's.
+    tech: orFallback(fallback.tech, sanity.tech),
     github: sanity.github || fallback.github,
     live: sanity.live || fallback.live,
     client: sanity.client || fallback.client,
@@ -51,18 +55,12 @@ export default function ProjectDetail() {
   const backHref = slug ? `/#project-${slug}` : '/#projects';
 
   useEffect(() => {
-    document.documentElement.classList.add('dark');
     // Always open a project page at the very top. Lenis keeps its scroll
     // position across client-side navigations, so reset it (not just the
     // window) and re-assert briefly in case it re-syncs after layout.
-    const toTop = () => {
-      const lenis = (window as any).__lenis;
-      if (lenis) lenis.scrollTo(0, { immediate: true, force: true });
-      else window.scrollTo(0, 0);
-    };
+    const toTop = () => scrollToY(0, { immediate: true });
     toTop();
-    const timers = [0, 60, 160].map((t) => setTimeout(toTop, t));
-    return () => timers.forEach(clearTimeout);
+    return reassert(toTop, [0, 60, 160]);
   }, [slug]);
 
   useEffect(() => {
@@ -107,12 +105,12 @@ export default function ProjectDetail() {
   if (!project) return <NotFound />;
 
   const cover = imageUrl(project.coverImageUrl, 2000);
-  const hasLive = project.live && project.live !== '#';
-  const showGithub = Boolean(project.github) && slug !== 'hexapod-robotic-arm';
-  const showActions = showGithub || hasLive;
+  const codeHref = codeUrl(project, slug);
+  const liveHref = liveUrl(project);
+  const showActions = Boolean(codeHref || liveHref);
 
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-primary/30 selection:text-primary">
+    <PageShell>
       {/* Reading progress */}
       <motion.div
         className="fixed top-0 left-0 right-0 h-[2px] bg-primary z-[60] origin-left"
@@ -121,12 +119,10 @@ export default function ProjectDetail() {
 
       {/* ---------- HERO (full-bleed, solid background) ---------- */}
       <section className="relative overflow-hidden">
-        <div className="relative container mx-auto max-w-7xl px-6 md:px-12 pt-16 md:pt-20 pb-6 md:pb-8">
+        <div className={cn(CONTAINER, 'relative max-w-7xl pt-16 md:pt-20 pb-6 md:pb-8')}>
           <div className="max-w-4xl">
             <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: EASE, delay: 0.05 }}
+              {...fadeUpOnMount(0.05)}
               className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-semibold leading-[1.02] tracking-tight text-primary"
             >
               {project.title}
@@ -134,9 +130,7 @@ export default function ProjectDetail() {
 
             {project.overview && (
               <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: EASE, delay: 0.15 }}
+                {...fadeUpOnMount(0.15)}
                 className="mt-7 text-base md:text-xl font-sans text-muted-foreground leading-relaxed max-w-3xl"
               >
                 {project.overview}
@@ -145,14 +139,12 @@ export default function ProjectDetail() {
 
             {showActions && (
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: EASE, delay: 0.25 }}
+                {...fadeUpOnMount(0.25)}
                 className="mt-10 flex flex-wrap items-center gap-3"
               >
-                {showGithub && (
+                {codeHref && (
                   <a
-                    href={project.github}
+                    href={codeHref}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-foreground rounded-full border border-white/10 hover:border-primary/40 hover:bg-white/[0.04] transition-all hover-lift"
@@ -160,9 +152,9 @@ export default function ProjectDetail() {
                     <Github className="w-4 h-4" /> View Code
                   </a>
                 )}
-                {hasLive && (
+                {liveHref && (
                   <a
-                    href={project.live}
+                    href={liveHref}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-background bg-primary hover:bg-primary/90 rounded-full transition-all glow-hover hover-lift"
@@ -178,12 +170,12 @@ export default function ProjectDetail() {
 
       {/* ---------- COVER (compact, full image visible) ---------- */}
       {cover && (
-        <section className="container mx-auto max-w-3xl px-6 md:px-12 pt-4">
+        <section className={cn(CONTAINER, 'max-w-3xl pt-4')}>
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: EASE }}
+            transition={{ duration: 0.8, ease: EASE_OUT_QUINT }}
             className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]"
           >
             <img
@@ -197,9 +189,7 @@ export default function ProjectDetail() {
 
       {/* ---------- BODY (sidebar + full-width content column) ---------- */}
       <section
-        className={`container mx-auto max-w-7xl px-6 md:px-12 pb-16 md:pb-20 ${
-          cover ? 'pt-12 md:pt-16' : 'pt-8 md:pt-10'
-        }`}
+        className={cn(CONTAINER, 'max-w-7xl pb-16 md:pb-20', cover ? 'pt-12 md:pt-16' : 'pt-8 md:pt-10')}
       >
         <div className="grid lg:grid-cols-[240px_1fr] gap-10 lg:gap-16 xl:gap-20">
           {/* Sticky spec sidebar — thin orange rule on its right edge, only as
@@ -235,7 +225,7 @@ export default function ProjectDetail() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-10% 0px' }}
-                transition={{ duration: 0.7, ease: EASE }}
+                transition={{ duration: 0.7, ease: EASE_OUT_QUINT }}
                 className="[&>*:first-child]:!mt-0"
               >
                 <PortableBody value={project.body} />
@@ -256,7 +246,7 @@ export default function ProjectDetail() {
                       initial={{ opacity: 0, y: 16 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true, margin: '-10% 0px' }}
-                      transition={{ duration: 0.5, ease: EASE, delay: i * 0.05 }}
+                      transition={{ duration: 0.5, ease: EASE_OUT_QUINT, delay: i * 0.05 }}
                       className="premium-card premium-card-hover rounded-2xl p-5 flex items-start gap-3"
                     >
                       <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
@@ -282,7 +272,7 @@ export default function ProjectDetail() {
 
       {/* ---------- FOOTER CTA (full width) ---------- */}
       <section className="border-t border-white/5">
-        <div className="container mx-auto max-w-7xl px-6 md:px-12 py-16">
+        <div className={cn(CONTAINER, 'max-w-7xl py-16')}>
           <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground/60 mb-2">Explore more</p>
           <Link
             href={backHref}
@@ -293,7 +283,7 @@ export default function ProjectDetail() {
           </Link>
         </div>
       </section>
-    </div>
+    </PageShell>
   );
 }
 

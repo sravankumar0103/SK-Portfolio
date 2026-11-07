@@ -1,16 +1,29 @@
 import React, { useEffect } from 'react';
 import Lenis from 'lenis';
+import { useReducedMotion } from 'framer-motion';
+import { SCROLL_DURATION, scrollEasing, setLenis } from '@/lib/lenis';
 
 interface SmoothScrollProps {
   children: React.ReactNode;
 }
 
 export function SmoothScroll({ children }: SmoothScrollProps) {
+  // Read once at mount: framer-motion's hook does not subscribe to changes, so
+  // flipping the OS setting mid-session applies on the next load.
+  const reduce = useReducedMotion();
+
   useEffect(() => {
+    // Reduced motion: no Lenis, so every scroll goes through the native
+    // fallbacks in lib/lenis.ts.
+    if (reduce) {
+      setLenis(null);
+      return;
+    }
+
     // Initialize Lenis
     const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      duration: SCROLL_DURATION,
+      easing: scrollEasing,
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
@@ -24,24 +37,21 @@ export function SmoothScroll({ children }: SmoothScrollProps) {
       infinite: false,
     });
 
-    // Expose the instance so other components (e.g. returning from a project
-    // page) can scroll to a section reliably instead of fighting Lenis.
-    (window as any).__lenis = lenis;
+    setLenis(lenis);
 
     // RAF loop for Lenis
-    function raf(time: number) {
+    let rafId = requestAnimationFrame(function raf(time: number) {
       lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-
-    requestAnimationFrame(raf);
+      rafId = requestAnimationFrame(raf);
+    });
 
     // Clean up
     return () => {
+      cancelAnimationFrame(rafId);
+      setLenis(null);
       lenis.destroy();
-      (window as any).__lenis = null;
     };
-  }, []);
+  }, [reduce]);
 
   return <>{children}</>;
 }

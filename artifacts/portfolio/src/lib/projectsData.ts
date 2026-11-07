@@ -6,25 +6,19 @@
 // Once you fill a project in Sanity Studio (with real screenshots), the CMS
 // version transparently takes over.
 // ---------------------------------------------------------------------------
+import type { PortableTextBlock } from '@portabletext/react';
 import type { SanityProject, SanityProjectDetail } from './sanityQueries';
 
 // --- Tiny Portable Text builders so fallback bodies share the CMS render path.
-const p = (text: string) => ({
+const block = (style: 'normal' | 'h2' | 'h3', text: string): PortableTextBlock => ({
   _type: 'block',
-  style: 'normal',
+  style,
   children: [{ _type: 'span', text }],
 });
-const h2 = (text: string) => ({
-  _type: 'block',
-  style: 'h2',
-  children: [{ _type: 'span', text }],
-});
-const h3 = (text: string) => ({
-  _type: 'block',
-  style: 'h3',
-  children: [{ _type: 'span', text }],
-});
-const bullets = (items: string[]) =>
+const p = (text: string) => block('normal', text);
+const h2 = (text: string) => block('h2', text);
+const h3 = (text: string) => block('h3', text);
+const bullets = (items: string[]): PortableTextBlock[] =>
   items.map((text) => ({
     _type: 'block',
     style: 'normal',
@@ -105,6 +99,21 @@ export const detailSlugByTitle: Record<string, string> = Object.fromEntries(
     .filter((p) => p.hasDetailPage && p.slug)
     .map((p) => [p.title, p.slug as string]),
 );
+
+// Projects whose "Code" link is only a GitHub profile (no single repo) — they get no Code link.
+const NO_CODE_SLUGS = new Set(['hexapod-robotic-arm']);
+
+/** The repo link to show for a project, or undefined when it should have none. */
+export function codeUrl(project: { github?: string }, slug?: string): string | undefined {
+  if (!project.github || NO_CODE_SLUGS.has(slug ?? '')) return undefined;
+  return project.github;
+}
+
+/** The live-demo link to show for a project, or undefined when it has none ('#' is a placeholder). */
+export function liveUrl(project: { live?: string }): string | undefined {
+  if (!project.live || project.live === '#') return undefined;
+  return project.live;
+}
 
 // ---------- Detail pages (blog), keyed by slug ----------
 export const fallbackProjectDetails: Record<string, SanityProjectDetail> = {

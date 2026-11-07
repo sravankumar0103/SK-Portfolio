@@ -5,24 +5,21 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useToast } from "@/hooks/use-toast";
+import { cn } from '@/lib/utils';
+import { CONTAINER } from '../layout/Section';
 import { ScrollRevealText } from '../ui/ScrollRevealText';
-import { useSanitySiteSettings } from '../../lib/sanityQueries';
+import { useSanitySiteSettings, orFallback } from '../../lib/sanityQueries';
+import { FALLBACK_EMAIL, fallbackSocials } from '../../lib/fallbackContent';
+import { scrollToY } from '../../lib/lenis';
 
-// Fallback content — used if Sanity is empty, loading, or unreachable.
-const FALLBACK_EMAIL = 'sravankumar0103@gmail.com';
-const fallbackSocials = [
-  { platform: 'github', url: 'https://github.com/sravankumar0103' },
-  { platform: 'linkedin', url: 'https://linkedin.com/in/diddi-sravan-kumar' },
-];
-
-function iconForPlatform(platform?: string): React.ReactNode {
+function platformInfo(platform?: string): { icon: React.ReactNode; label: string } {
   switch (platform) {
-    case 'github': return <Github className="w-5 h-5" />;
-    case 'linkedin': return <Linkedin className="w-5 h-5" />;
-    case 'email': return <Mail className="w-5 h-5" />;
-    case 'twitter': return <Twitter className="w-5 h-5" />;
-    case 'instagram': return <Instagram className="w-5 h-5" />;
-    default: return <Globe className="w-5 h-5" />;
+    case 'github': return { icon: <Github className="w-5 h-5" />, label: 'GitHub' };
+    case 'linkedin': return { icon: <Linkedin className="w-5 h-5" />, label: 'LinkedIn' };
+    case 'email': return { icon: <Mail className="w-5 h-5" />, label: 'Email' };
+    case 'twitter': return { icon: <Twitter className="w-5 h-5" />, label: 'X (Twitter)' };
+    case 'instagram': return { icon: <Instagram className="w-5 h-5" />, label: 'Instagram' };
+    default: return { icon: <Globe className="w-5 h-5" />, label: 'Website' };
   }
 }
 
@@ -42,7 +39,7 @@ export function Contact() {
   const { toast } = useToast();
   const { data: settings } = useSanitySiteSettings();
   const email = settings?.contactEmail || FALLBACK_EMAIL;
-  const socials = settings?.socials && settings.socials.length ? settings.socials : fallbackSocials;
+  const socials = orFallback(settings?.socials, fallbackSocials);
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<ContactFormValues>({
     resolver: zodResolver(contactSchema),
@@ -121,7 +118,7 @@ export function Contact() {
 
   return (
     <section id="contact" className="pt-4 md:pt-12 pb-2 relative overflow-hidden">
-      <div className="container mx-auto px-6 md:px-12 relative z-10">
+      <div className={cn(CONTAINER, 'relative z-10')}>
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-24 items-start">
 
           {/* Info Side (Left) */}
@@ -140,8 +137,7 @@ export function Contact() {
                 Let&apos;s build <br />
                 <ScrollRevealText 
                   text="something" 
-                  to="hsl(11, 81%, 57%)" 
-                  from="rgba(255,255,255,0.1)"
+                  tone="primary"
                   className="italic tracking-tight" 
                 /> <br />
                 great.
@@ -152,8 +148,10 @@ export function Contact() {
               </p>
 
               <div className="space-y-8">
-                <motion.div
-                  className="group cursor-pointer inline-flex flex-col"
+                <motion.button
+                  type="button"
+                  aria-label={`Copy email address ${email}`}
+                  className="group cursor-pointer inline-flex flex-col text-left"
                   onClick={copyEmail}
                   whileHover={{ x: 5 }}
                   whileTap={{ scale: 0.95 }}
@@ -161,18 +159,18 @@ export function Contact() {
                   <span className="text-[10px] font-sans text-muted-foreground uppercase tracking-[0.3em] mb-2 group-hover:text-primary transition-colors">
                     Direct Email
                   </span>
-                  <div className="flex items-center gap-4">
+                  <span className="flex items-center gap-4">
                     <span className="text-lg sm:text-xl md:text-2xl font-sans text-foreground">
                       {email}
                     </span>
-                    <motion.div 
+                    <motion.span
                       className="w-10 h-10 rounded-full bg-white/[0.03] border border-white/10 flex items-center justify-center group-hover:bg-primary group-hover:text-background transition-all duration-300"
                       animate={copied ? { scale: [1, 1.2, 1] } : {}}
                     >
                       {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
-                    </motion.div>
-                  </div>
-                </motion.div>
+                    </motion.span>
+                  </span>
+                </motion.button>
               </div>
             </motion.div>
           </div>
@@ -191,6 +189,7 @@ export function Contact() {
                   <div className="relative group">
                     <input
                       {...register('name')}
+                      autoComplete="name"
                       type="text"
                       className="peer w-full bg-transparent border-b border-white/10 py-1 outline-none focus:border-primary transition-all font-sans text-sm placeholder-transparent"
                       id="name"
@@ -207,6 +206,7 @@ export function Contact() {
                   <div className="relative group">
                     <input
                       {...register('email')}
+                      autoComplete="email"
                       type="email"
                       className="peer w-full bg-transparent border-b border-white/10 py-1 outline-none focus:border-primary transition-all font-sans text-sm placeholder-transparent"
                       id="email"
@@ -275,27 +275,14 @@ export function Contact() {
           <div className="flex gap-4">
             {socials
               .filter((s) => s.url)
-              .map((s, i) => (
-                <SocialIcon key={s.url || i} href={s.url as string} icon={iconForPlatform(s.platform)} />
-              ))}
+              .map((s, i) => {
+                const { icon, label } = platformInfo(s.platform);
+                return <SocialIcon key={s.url || i} href={s.url as string} icon={icon} label={label} />;
+              })}
           </div>
 
           <motion.button
-            onClick={() => {
-              // Delegate to Lenis's own RAF loop (already running in
-              // SmoothScroll.tsx) instead of a separate hand-rolled one.
-              // Calling scrollTo again also naturally supersedes any
-              // in-flight Navbar scroll-to-section animation.
-              const lenis = (window as any).__lenis;
-              if (lenis) {
-                lenis.scrollTo(0, {
-                  duration: 1.2,
-                  easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-                });
-              } else {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }
-            }}
+            onClick={() => scrollToY(0)}
             className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-primary hover:text-background hover:bg-primary hover:border-primary transition-all duration-500 group shadow-lg"
             whileHover={{ y: -5, scale: 1.1 }}
             title="Back to top"
@@ -316,12 +303,13 @@ export function Contact() {
   );
 }
 
-function SocialIcon({ href, icon }: { href: string; icon: React.ReactNode }) {
+function SocialIcon({ href, icon, label }: { href: string; icon: React.ReactNode; label: string }) {
   return (
     <motion.a
       href={href}
       target="_blank"
       rel="noreferrer"
+      aria-label={`${label} (opens in a new tab)`}
       className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/40 transition-all duration-500"
       whileHover={{ y: -5, scale: 1.1 }}
     >

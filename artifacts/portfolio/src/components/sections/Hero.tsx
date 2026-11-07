@@ -2,8 +2,12 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { HeroScene } from '../3d/HeroScene';
 import { Github, Linkedin, Mail, ArrowRight } from 'lucide-react';
+import { CONTAINER } from '../layout/Section';
 import { Magnetic } from '../ui/Magnetic';
 import { useSanitySiteSettings } from '../../lib/sanityQueries';
+import { EASE_OUT_EXPO } from '../../lib/motion';
+import { scrollToElement } from '../../lib/lenis';
+import { cn } from '@/lib/utils';
 
 // Fallback content — used if Sanity is empty, loading, or unreachable.
 const FALLBACK_RESUME_URL =
@@ -24,7 +28,7 @@ export function Hero() {
         <HeroScene />
       </div>
 
-      <div className="relative z-10 w-full container mx-auto px-6 md:px-12 flex flex-col justify-end md:justify-center h-full pb-[15vh] md:pt-20 md:pb-0">
+      <div className={cn(CONTAINER, 'relative z-10 w-full flex flex-col justify-end md:justify-center h-full pb-[15vh] md:pt-20 md:pb-0')}>
         <div className="w-full md:w-3/5 md:pr-12">
           <motion.div
             initial={{ opacity: 0 }}
@@ -37,7 +41,7 @@ export function Hero() {
                 <motion.span
                   initial={{ y: "100%" }}
                   animate={{ y: 0 }}
-                  transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 1.2, ease: EASE_OUT_EXPO }}
                   className="block whitespace-nowrap premium-gradient-text"
                 >
                   {firstName}
@@ -47,7 +51,7 @@ export function Hero() {
                 <motion.span
                   initial={{ y: "100%" }}
                   animate={{ y: 0 }}
-                  transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+                  transition={{ duration: 1.2, ease: EASE_OUT_EXPO, delay: 0.1 }}
                   className="block premium-gradient-text"
                 >
                   {lastName}
@@ -78,7 +82,8 @@ export function Hero() {
                   href="#about"
                   onClick={(e) => {
                     e.preventDefault();
-                    document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+                    const about = document.getElementById('about');
+                    if (about) scrollToElement(about, 0);
                   }}
                   className="bg-primary text-background px-[clamp(20px,4vw,32px)] py-[clamp(12px,2vw,16px)] rounded-full font-sans text-sm uppercase tracking-widest hover:bg-white transition-colors flex items-center gap-2 group"
                 >
@@ -119,7 +124,7 @@ export function Hero() {
             }}
             transition={{
               duration: 2,
-              repeat: Infinity,
+              repeat: 1,
               ease: "easeInOut"
             }}
             className="w-0.5 h-1 bg-primary/60 rounded-full"
